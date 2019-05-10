@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>计算属性的setter和getter</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <div id="app">
+        {{fullName}}
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                firstName: "Liu",
+                lastName: "Zhenghe"
+            },
+            // computed 有这样一个特性：当他依赖的值发生变化的时候，它就会去重新的计算
+            computed: {
+                fullName: {
+                    get: function () {
+                        return this.firstName + " " + this.lastName
+                    },
+                    set: function (value) {
+                        console.log(value);
+                        var arr = value.split(" ");
+                        console.log(arr);
+                        this.firstName = arr[0];
+                        this.lastName = arr[1];
+                    }
+                }
+            }
+        })
+        // 通过这个例子，可以知道，在 computed 上，不仅可以通过 get 方法，通过其他的值算出一个新值，同时可以写 set 方法，通过设置一个值，来改变他相关联的一个值，而改变了相关的值后，又使 fullName 的值重新计算。
+
+        // ![](https://i.loli.net/2019/05/05/5ccef44054b9f.jpg)
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>计算属性，方法和侦听器</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <div id="app">
+        {{fullName}}
+        {{age}}
+    </div>
+
+    <div id="app2">
+        {{fullName()}}
+        {{age}}
+    </div>
+
+    <div id="app3">
+        {{fullName}}
+        {{age}}
+    </div>
+
+    <script>
+        // fullName 的计算
+
+        // 方式一：computed 计算属性
+        var app = new Vue({
+            el: "#app",
+            data: {
+                firstName: "Liu",
+                lastName: "Zhenghe",
+                age: 26
+            },
+            // 计算属性（有缓存机制，会提高性能）
+            computed: {
+                fullName: function () {
+                    console.log("计算了一次！");
+                    return this.firstName + this.lastName;
+                }
+            }
+            // 可以看到页面渲染出 LiuZhenghe
+
+            // 如何证明 computed 具有缓存机制？在 fullName 方法中打印一句话“计算了一次！”，在控制台改变 age 的值，再改变 fullName 中计算过的属性值。
+            // 可以看到，页面一刷新的时候，打印一遍 “计算了一次！”，改变 age，没有打印这句话，改变 lastName，又打印一遍 “计算了一次！”。
+            // ![](https://upload-images.jianshu.io/upload_images/9373308-e648b154a93400d6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+        })
+
+        // 方式二：methods
+        // 接着用 methods 的方式计算一下 fullName:
+        var app2 = new Vue({
+            el: "#app2",
+            data: {
+                firstName: "Liu",
+                lastName: "Zhenghe",
+                age: 26
+            },
+            methods: {
+                fullName: function () {
+                    console.log("计算了一次！");
+                    return this.firstName + this.lastName;
+                }
+            }
+        })
+
+        // 可以看到，页面一刷新的时候，打印一遍 “计算了一次！”，改变 age，也打印这句话，改变 lastName，又打印一遍 “计算了一次！”。
+        // 所以，说明 methods 方法是没有缓存机制的，只要改变了数据，就会重新计算一次。
+        // ![](https://upload-images.jianshu.io/upload_images/9373308-f5ac5864e5c3ab7f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+
+
+
+        // 方式三：watch 侦听器
+        // 最后用 watch 的方式计算一下 fullName:
+        var app3 = new Vue({
+            el: "#app3",
+            data: {
+                firstName: "Liu",
+                lastName: "Zhenghe",
+                fullName: "LiuZhenghe",
+                age: 26
+            },
+            watch: {
+                firstName: function () {
+                    console.log("计算了一次！");
+                    this.fullName = this.firstName + this.lastName;
+                },
+                lastName: function () {
+                    console.log("计算了一次！");
+                    this.fullName = this.firstName + this.lastName;
+                }
+            }
+        })
+        // 改变 age，并没有打印出 “计算了一次！”这句话，改变 firstName 和 lastName 的值，发现打印出了这句话，说明 watch 和 computed 一样具有缓存机制，但和 computed 相比，watch 逻辑代码多出很多，所以，当这三种计算方式都能实现计算功能的时候，优先选择 computed。
+        // ![](https://upload-images.jianshu.io/upload_images/9373308-d27c9b55642fd1d6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+    </script>
+
+</body>
+
+</html>

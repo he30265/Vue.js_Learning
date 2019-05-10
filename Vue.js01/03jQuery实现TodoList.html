@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>jQuery实现TodoList</title>
+    <script src='https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js'></script>
+</head>
+
+<body>
+
+    <div>
+        <input id="ipt" type="text">
+        <button id="btn">添加</button>
+        <ul id="ul"></ul>
+    </div>
+    <script>
+        // jQuery TodoList  MVP 设计模式
+        // 使用面向对象编写
+        // 创建一个构造函数
+        function Page() {};
+        // 通过 $.extend 方法在 Page 的 prototype 上增加一些方法
+        $.extend(Page.prototype, {
+            // 初始化方法
+            init: function () {
+                this.bindEvents();
+            },
+            // 绑定事件
+            bindEvents: function () {
+                var btn = $("#btn");
+                btn.on('click', $.proxy(this.handleBtnClick, this));
+            },
+            handleBtnClick: function () {
+                var ipt = $("#ipt");
+                var iptVal = ipt.val(); // 输入的值
+                var ul = $("#ul");
+                ul.append("<li>" + iptVal + "</li>");
+                ipt.val("");
+                console.log(iptVal);
+            }
+        });
+        // 创建一个实例
+        var page = new Page();
+        page.init();
+    </script>
+
+</body>
+
+</html>

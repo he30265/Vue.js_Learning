@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>07Vue.js中的条件渲染</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 一、条件渲染 v-if 和 v-show 对比 -->
+    <div id="app">
+        <!--  v-if 后面跟一个 js 表达式，它的返回值（true,false）决定了这个元素是否真实的被挂载到页面上。 -->
+        <!-- 在 data 中 show 默认为 true，是显示的，可以在控制台中修改一下 show 的值：“app.show = false”，发现该 dom 不存在了，改为 true，该 dom 又显示了。 -->
+        <div v-if="show">{{msg}}</div>
+
+        <!-- 打开网页，可以看到，无论是 v-if 还是 v-show，如果 data 中的 show 值是 false，那么两个元素都不显示，我们在控制台中查看一下两个元素： -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-b40bab40052f6f2c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+        <!-- 发现，v-if 在页面上就不显示了，而 v-show 元素是存在的，只是样式被加了 “display: none;” -->
+        <div v-show="show">{{msg}}</div>
+
+        <!-- v-show 的性能更会高一些，因为它不会频繁的去把有个 dom 从页面上删再添加。 -->
+    </div>
+
+
+    <!-- 二、更复杂的使用 v-if -->
+    <!-- v-if 和 v-else -->
+    <div id="app2">
+        <div v-if="show">{{msg}}</div>
+        <!-- v-else：如果 show 的值是 false 的话，就显示 v-else 中的值。 -->
+        <!-- 注：v-if 和 v-else 两个元素中间不能加其他元素，否则条件判断不能生效。 -->
+        <div v-else>Bye World</div>
+    </div>
+
+    <!-- v-if、v-else-if、v-else -->
+    <div id="app3">
+        <dir v-if="show === 'a'">This is a</dir>
+        <dir v-else-if="show === 'b'">This is b</dir>
+        <dir v-else>This is other</dir>
+    </div>
+    <!-- 可以在控制台中改变一下 show 的值，当时 show 的值为 a 时，显示 “This is a”，为 b 时，显示 “This is b”，为其他时，显示 “This is other。” -->
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-6a27890b53834330.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+
+    <!-- 三、key 值 -->
+    <div id="app4">
+        <div v-if="show">
+            用户名：<input type="text" key="username">
+        </div>
+        <div v-else>
+            邮箱：<input type="text" key="email">
+        </div>
+    </div>
+    <!-- 因为 show 的值是 true，所以此时页面上显示的是用户名输入框，我们在输入框中输入内容，然后在控制台中改变 show 的值为 flase，发现输入框更换为邮箱了，但是输入框里的内容并没有变，这是因为 Vue 在重新渲染页面的时候，会尽量的复用页面上已存在的 dom，当显示用户名的时候，已经有了一个 input，当切换邮箱名的时候，Vue 会发现以前页面上有一个 input，所以他的机制会尽量的帮你复用页面上的 dom，回去尝试复用这个 input，但是内容并没有被清空。 -->
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-a4a369fb51c18952.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 解决方法：在 input 中加 key 值，例如给用户名加一个 key 值 “key="username"”，邮箱加一个 “key="email"”，此时再改变 show 的值，发现输入框内容被清空了功能也没有任何的 bug 了。当给元素加一个 key 值的时候，Vue 会知道他是页面上唯一的元素，如果两个元素的 key 值不一样，Vue 就不会尝试复用以前的 input 标签了。 -->
+
+    <script>
+        // 一、条件渲染 v-if 和 v-show 对比
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: false,
+                msg: "Hello World"
+            }
+        })
+
+
+        // 二、更复杂的使用 v-if
+        // v-if 和 v-else
+        var app2 = new Vue({
+            el: "#app2",
+            data: {
+                show: false,
+                msg: "Hello World"
+            }
+        })
+
+
+        // v-if、v-else-if、v-else
+        var app3 = new Vue({
+            el: "#app3",
+            data: {
+                show: 'a',
+                msg: "Hello World"
+            }
+        })
+
+        // 三、key 值
+        var app4 = new Vue({
+            el: "#app4",
+            data: {
+                show: true
+            }
+        })
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js的模板语法</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- 模板语法 1：插值表达式 -->
+        {{msg}}
+
+        <!-- 模板语法 2：v-text -->
+        <!-- v-text 指令，让标签内的 innerText 和 msg 绑定，后面的值是一个 js 表达式 -->
+        <div v-text="msg" id="Vtext"></div>
+
+        <!-- 模板语法 3：v-html -->
+        <!-- v-html 让标签内的 innerHTML 和 msg 绑定 -->
+        <div v-html="msg" id="Vhtml"></div>
+
+        <!-- 目前来看，v-text 和 v-HTML 没有区别，我们把 msg 中的值变成一个标签，例如 “<h1>hello</h1>”，v-text 渲染的依然是 “<h1>hello</h1>”，而 v-HTML 渲染出的就是 h1 字号的 “hello” -->
+
+        <!-- 通过以上的例子得出，插值表达式和 v-text 的渲染结果是一样的 -->
+
+        <!-- 凡是 v-*** 后面的内容都是一个 js 表达式，在表达式中，不仅可以写一个变量，还可以往后面加一个字符串 -->
+        <!-- 插值表达式中也可以写 js 表达式 -->
+        {{msg + ' world'}}
+        <div v-text="msg + ' world'"></div>
+        <div v-html="msg + ' world'"></div>
+
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                msg: "hello"
+                // msg : "<h1>hello</h1>"
+            }
+        })
+        var Vtext = document.getElementById('Vtext');
+        console.log(Vtext.innerText); // hello
+
+        var Vhtml = document.getElementById('Vhtml');
+        console.log(Vhtml.innerHTML); // hello
+    </script>
+
+</body>
+
+</html>

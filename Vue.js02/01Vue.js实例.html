@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js实例</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <div id="app">
+        <div v-on:click="clickFun">{{msg}}</div>
+        <test></test>
+    </div>
+    <script>
+        // 一个 Vue 的项目，是由很多个组件组成的
+        // vue 组件也是一个实例
+        // 也可以说一个 Vue 的项目是由很多很多 Vue 实例拼装成的
+        Vue.component('test', {
+            template: "<h1>hello</h1>"
+        })
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                msg: "hello world"
+            },
+            methods: {
+                clickFun() {
+                    alert("hello");
+                }
+            }
+        })
+        console.log(app); // wn {_uid: 0, _isVue: true, $options: {…}, _renderProxy: wn, _self: wn, …}
+        console.log(app.$el); // <div id="app"><div>hello world</div></div>
+        console.log(app.$data); // {__ob__: we}
+        console.log(app.$data.msg); // hello world
+    </script>
+
+</body>
+
+</html>

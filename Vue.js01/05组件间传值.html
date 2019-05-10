@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>组件间传值</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" v-model="inputValue">
+        <button v-on:click="btnClick">添加</button>
+        <ul>
+            <todo-list v-bind:content="item" v-bind:index="index" v-for="(item,index) in list" v-on:="handleItemDelete">
+            </todo-list>
+        </ul>
+    </div>
+    <script>
+        // v-bind：父组件给子组件传值
+        // 创建一个局部变量，子组件 TodoList
+        var TodoList = {
+            props: ['content', 'index'],
+            template: "<li v-on:click='handleItemClick'>{{content}}</li>",
+            methods: {
+                // 子组件中写一个 handleItemClick 方法
+                handleItemClick: function () {
+                    // 子组件向父组件传值 $emit，向外触发事件
+                    // 第二个参数作为点击的位置
+                    this.$emit("delete", this.index);
+                }
+            }
+        };
+
+        // 父组件
+        var app = new Vue({
+            el: '#app',
+            // 注册一个局部组件，把 TodoList 注册到 vue 事例中
+            components: {
+                TodoList: TodoList
+            },
+            data: {
+                list: [],
+                inputValue: ''
+            },
+            methods: {
+                btnClick: function () {
+                    this.list.push(this.inputValue);
+                    this.inputValue = '';
+                },
+                handleItemDelete: function (index) {
+                    console.log(this.list)
+                    this.list.splice(index, 1);
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

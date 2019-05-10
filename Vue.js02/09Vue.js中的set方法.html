@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js中的set方法</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 先来回顾上一节我们说过的，如果要改变对象 userInfo 中的属性和值，就要通过它的引用来改变，这样才会让页面也更新。 -->
+    <div id="app">
+        <div v-for="(item, key, index) of userInfo">
+            {{item}} --- {{key}} --- {{index}}
+        </div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                userInfo: {
+                    name: "liu",
+                    age: 26,
+                    gender: "male",
+                    salary: "secret"
+                }
+            }
+        })
+    </script>
+
+    <!-- 那除了改变引用是否还有其他方法能在改变数据后页面也更新呢？下面看一下 Vue.js 中的 set 方法。 -->
+
+    <!-- 1、对象中的 set 方法： -->
+    <div id="app2">
+        <div v-for="(item, key, index) of userInfo">
+            {{item}}---{{key}}---{{index}}
+        </div>
+    </div>
+    <script>
+        var app2 = new Vue({
+            el: "#app2",
+            data: {
+                userInfo: {
+                    name: "liu",
+                    age: 26,
+                    gender: "male",
+                    salary: "secret"
+                }
+            }
+        })
+    </script>
+    <!-- 可以通过构造函数来更新 userInfo 中的属性值，例如：“Vue.set(app2.userInfo,"address","Beijing")”，也可以通过实例对象来更新 userInfo 中的属性值，例如 “app2.$set(app2.userInfo,"tel","1234567")”，这两种方法在更新数据后，页面也都会同步更新。 -->
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-360e8b6e508650d5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240) -->
+
+
+    <!-- 2、数组中的 set 方法： -->
+    <!-- 上一节讲过，数组的操作有两种方式，一种是调用数组的变异方法，也就是那 7 个操作数组的方法（pop、push、shift、unshift、splice、sort、reverse），还有一种，直接改变数组的引用。 -->
+    <!-- 接下来再讲一种方法，就是 set 方法，它可以帮助我们直接操作数组的每一项。 -->
+    <div id="app3">
+        <div v-for="item in list">{{item}}</div>
+    </div>
+    <script>
+        var app3 = new Vue({
+            el : "#app3",
+            data : {
+                list : [1, 2, 3, 4]
+            }
+        })
+    </script>
+    <!-- 在控制台中，分别通过全局对象（构造函数）和实例对象来更新 list 中的数据，可以看到这两种方法在更新数据后，页面也都会同步更新。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-42f9f74d58c85811.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+</body>
+
+</html>

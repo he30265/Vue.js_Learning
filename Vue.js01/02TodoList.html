@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>TodoList</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+
+</head>
+
+<body>
+    <div id="app">
+        <input type="text" v-model="inputValue">
+        <button v-on:click="btnClick">添加</button>
+        <ul>
+            <li v-for="item in list">{{item}}</li>
+        </ul>
+    </div>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                list: [],
+                inputValue: ''
+            },
+            methods: {
+                btnClick: function () {
+                    console.log(this.inputValue);
+                    this.list.push(this.inputValue);
+                    this.inputValue = '';
+                }
+            }
+        });
+    </script>
+    <!-- 上面代码中，给 input 绑定一个 v-model 指令，值和 data 中的 inputValue 关联，然后通过 v-on 给 button 绑定一个 click 事件 “btnClick”，事件写到实例的 methods 中，在该事件中，通过 this 可以获取到当前实例的属性和值，实现向 data 中 list 数组里添加 inputVlaue 的值。最后通过 v-for 指令，将 list 数组中的值循环渲染到页面上。 -->
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-0fde1dba1271969f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+</body>
+
+</html>

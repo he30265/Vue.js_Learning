@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js中的样式绑定</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 样式和数据绑定，实现：点击一次，元素变色，再点击一次，元素颜色变回来。 -->
+
+    <!-- 方式一：class 的对象绑定，借助 class 和对象的形式做样式和数据的绑定。-->
+    <!-- 注：“:class 中传 js 字符串” -->
+    <div id="app">
+        <div v-on:click="handleDivClick" :class="{activted:isActivated}">Hello World!</div>
+    </div>
+
+    <!-- 方式二：:class 中不再写入一个对象，而是写一个数组，在数组中写一个 activted。 -->
+    <!-- 此时代码应该这样读 div 元素上会显示一个 class，它显示的其实是 activted 的这个变量里的内容。 -->
+    <div id="app2">
+        <div v-on:click="handleDivClick" :class="[activted]">Hello World!</div>
+    </div>
+
+    <!-- 方式三：通过 style 来改变样式，:style 中写 js 字符串。 -->
+    <div id="app3">
+        <div v-on:click="divStyleClick" :style="styleObj">Hello World!</div>
+    </div>
+
+    <!-- 方式四：通过 style 来改变样式，:style 中写数组。 -->
+    <!-- 数组中还可以挂载多个样式： -->
+    <div id="app4">
+        <div v-on:click="divStyleClick" :style="[styleObj, {fontSize : '24px'}]">Hello World!</div>
+    </div>
+
+    <!-- 总结：无论是绑定 class 还是 style，都有两种方式，一种是通过对象的方式绑定，一种是通过数组的方式绑定。 -->
+
+    <style>
+        .activted {
+            color: red;
+        }
+    </style>
+
+    <script>
+        // 方式一：
+        var app = new Vue({
+            el: "#app",
+            data: {
+                isActivated: false
+            },
+            methods: {
+                handleDivClick: function () {
+                    // this.isActivated = true; // 只能实现点击一次变色效果
+                    this.isActivated = !this.isActivated; // 相当于 jQuery 的 toggleClass() 方法
+                }
+            }
+        })
+
+        // 方拾二：
+        var app2 = new Vue({
+            el: "#app2",
+            data: {
+                activted: "" // 默认是空
+            },
+            methods: {
+                handleDivClick: function () {
+                    // this.activted = "activted"; // 只能实现点击一次变色效果
+                    //用 if 判断实现点击切换效果：
+                    // if (this.activted === "activted") {
+                    //     this.activted = "";
+                    // } else {
+                    //     this.activted = "activted"
+                    // };
+
+                    // 用三元运算符实现点击切换效果：
+                    this.activted = this.activted === "activted" ? "" : "activted";
+                }
+            }
+        })
+
+        // 方式三：
+        var app3 = new Vue({
+            el: "#app3",
+            data: {
+                styleObj: {
+                    color: "black"
+                }
+            },
+            methods: {
+                divStyleClick: function () {
+                    this.styleObj.color = this.styleObj.color === "black" ? "red" : "black";
+                }
+            }
+        })
+
+        // 方式四：
+        var app4 = new Vue({
+            el: "#app4",
+            data: {
+                styleObj: {
+                    color: "black"
+                }
+            },
+            methods: {
+                divStyleClick: function () {
+                    this.styleObj.color = this.styleObj.color === "black" ? "red" : "black"
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>08Vue.js中的列表渲染</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <div id="app">
+        <!-- 列表循环最基础的内容： -->
+        <div v-for="item in list">{{item}}</div>
+        <!-- of 和 in 的效果一样 -->
+        <div v-for="item of list">{{item}}</div>
+
+        <!-- 可以在 item 后再加一个参数 index，代表索引下标 -->
+        <div v-for="(item, index) of list">
+            {{item}} --- {{index}}
+        </div>
+
+        <!-- 在实际的开发中，为了提升循环显示的性能，我们会给每一个循环项上加唯一的 key 值，可以在循环向上加一个 key 值，因为目前 index 的值是唯一的，所以使用 index 作为 key 值。 -->
+        <div v-for="(item, index) of list" :key="index">
+            {{item}} --- {{index}}
+        </div>
+        <!-- 但是不推荐这样使用 index 的，因为使用 index 作为 key 值，在平凡操作 DOM 元素相对应的数据的时候，是比较费性能的，可能让 Vue 没法充分的复用 dom 节点。如果不用 index 做 key 值。那用什么呢？ -->
+        <!-- 一般在真正的项目中，后端向前端返回数据的时候，list 并不是写死的一个数据，后端反数据的时候，一般会携带一个数据相关的唯一标识符，一般是 id，可能是数据对应的一个随机的数据段，例如 list2: -->
+        <div v-for="(item, index) of list2" :key="item.id">
+            {{item.text}} --- {{index}}
+        </div>
+        <!-- 这个时候，key 值就没必要是 index 了，可以用 item.id -->
+
+        <!-- 我们可以参考之前 TodoList 在控制台中给 list2 添加数据，可以看到数据添加成功，页面更新了： -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-fc2a862a96c11c74.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+        <!-- 如果通过下标添加数据呢？可以在控制台看到数据添加成功,但是页面却没有更新 -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-7289c1a8b2fb99c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+        <!-- 到这里，需要讲一个内容，当我们去尝试修改数组里的内容时，不能直接通过下标的形式，只能通过 Vue 提供的几个数组变异方法来操作数组，才能够实现数据发生变化，页面也跟着变这种响应式效果。在 Vue 中一共提供了 7 个数组变异方法来帮助我们操作数组，他们分别是： -->
+        <!-- pop：把数组最后一项删除掉；
+            push：往数组里增加一条；
+            shift：把数组的第一项删除掉；
+            unshift：往数组的第一项里加点儿内容；
+            splice：数组的截取；
+            sort：对驻足进行排序；
+            reverse：对数组取反。
+         -->
+        <!-- 回到页面上，例如将第二项做一个替换，可以在控制台做如下操作： -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-e464382dd52c5b21.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+        <!-- 除了变异方法可以改变页面数据的显示，还有一种方法，就是改变引用： -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-edcf259a39e1af8d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+        <!-- 上边数组循环只循环了一个数据，假设有这样一个情况：不仅要根据 list2 循环一个 div，还要根据 list2 循环一个 span 标签： -->
+        <div v-for="(item, index) of list2">
+            <div>
+                {{item.text}} --- {{index}}
+            </div>
+            <span>
+                {{item.text}} --- {{index}}
+            </span>
+        </div>
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-d785c5c365944594.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+        <!-- 如果要想显示一个 span 一个 div 就必须在外层包裹一个 div，假设在需求里就不想让这个 div 存在，有什么办法么？ -->
+        <!-- template 占位符，可以把外层 div 改为 template，也可以理解为一个模板占位符，回到页面上，可以看到依然是 div，span 的显示方式，但是最外层的 div 就消失了。 -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-36857ab4d0b4a3e4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+        <!-- 其实这个 template 模板占位符可以帮我们去包裹一些元素，但是在循环的时候并不会被真正的渲染到页面上。 -->
+        <template v-for="(item, index) of list2">
+            <div>
+                {{item.text}} --- {{index}}
+            </div>
+            <span>
+                {{item.text}} --- {{index}}
+            </span>
+        </template>
+
+
+        <!-- 除了数组可以做循环之外，其实还可以对对象做一个循环，接下来看一下对象怎么做循环： -->
+        <div v-for="item of userInfo">{{item}}</div>
+        <!-- item 还可以接收其他内容 key，index -->
+        <div v-for="(item, key, index) of userInfo">
+            {{item}} --- {{key}} --- {{index}}
+        </div>
+        <!-- 我们在控制台改变一下 userInfo 中的值： -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-714f39913febf880.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+        <!-- 可以看到，改变  userInfo 中的某个值，页面会更新，但是新添加一个 address 值，数据变了，但页面不会更新，所以当你去便历对象的时候，如果直接动态的往里加值是不好用的，但是如果就是相加那怎么加呢？ -->
+        <!-- 可以和数组的方式一样，直接改变他的引用： -->
+        <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-6add4ee974b2e481.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+        <!-- 通过改变引用这种方式，数据变化了，页面也就变化了。 -->
+    </div>
+
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                list: [
+                    "one",
+                    "two",
+                    "three",
+                    "four",
+                    "five"
+                ],
+                list2: [{
+                    id: "10001",
+                    text: "one"
+                }, {
+                    id: "10002",
+                    text: "two"
+                }, {
+                    id: "10003",
+                    text: "three"
+                }],
+                userInfo: {
+                    name: "liu",
+                    age: "26",
+                    gender: "male",
+                    salary: "secret"
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

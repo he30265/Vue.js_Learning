@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue.js实例生命周期函数</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <div id="app"></div>
+    <script>
+        // 生命周期函数就是 Vue 实例在某一个时间点会自动执行的函数
+        // 这些函数并不是放到 methods 中，而是直接放到 Vue 的实例中
+        var app = new Vue({
+            el: "#app",
+            template: "<div>{{msg}}</div>",
+            data: {
+                msg: "hello world"
+            },
+            // Vue 实例部分初始化的时候执行
+            beforeCreate: function () {
+                console.log("beforeCreate");
+            },
+            created: function () {
+                console.log("create");
+            },
+            beforeMount: function () {
+                console.log(this.$el); // <div id="app"></div>
+                console.log("beforeMount");
+            },
+            mounted: function () {
+                console.log(this.$el); // <div>hello word</div>
+                console.log("mounted");
+            },
+            // beforeDestroy 和 destroyed 需要先销毁，才会执行，在控制台执行 app.$destroy
+            beforeDestroy: function () {
+                console.log("beforeDestroy");
+            },
+            destroyed: function () {
+                console.log("destroyed");
+            },
+            // 当数据发生改变时，beforeUpdate 和 updated 才会执行
+            beforeUpdate: function () {
+                console.log("beforeUpdate");
+            },
+            updated: function () {
+                console.log("updated");
+            }
+        })
+    </script>
+
+</body>
+
+</html>
