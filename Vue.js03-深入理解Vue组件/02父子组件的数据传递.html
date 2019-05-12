@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>父子组件的数据传递</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 上一节学习 ref 的时候，讲解了子组件如何通过事件触发的形式向向父组件传递数据，这一节将会系统的借助 counter 这个例子来讲解父子组件之间更多的数据传递方式。 -->
+
+    <!-- <div id="app">
+        <counter :count="1"></counter>
+        <counter :count="2"></counter>
+    </div>
+
+    <script>
+        // 创建一个局部组件
+        var counter = {
+            props: ['count'],
+            data: function () {
+                return {
+                    number: this.count
+                }
+            },
+            template: "<div @click='clickFun'>{{number}}</div>",
+            methods: {
+                clickFun: function () {
+                    this.number++
+                }
+            }
+        }
+        var app = new Vue({
+            el: "#app",
+            components: {
+                counter: counter
+            }
+        })
+    </script> -->
+
+    <!-- 上面代码，我们先创建一个局部组件 counter，可以在模板中先写死一个数据 0，之后在父组件中通过 components 来注册这个组件，真样就可以在父组件的模板里使用这个组件了。 -->
+
+    <!-- 首先我们要讲父组件怎么向子组件传递数据，父组件通过属性的形式来传递数据，可以在子组件中写一个 count='0'，或者是 :count='0'，这样传递给子组件的 0 或 1，就变成一个数字了，如果不加冒号，传给子组件的 0 或 1 实际上就是一个字符串，因为如果加了冒号，后面双引号里的内容实际上就是一个 js 表达式了，不是字符串了，所以他就是一个数字类型了。 -->
+
+    <!-- 父组件通过属性的形式向 counter 这个子组件传递了一个名字叫做 count 的属性，那子组件要接收一下，才能使用这个数据，怎么接受呢？要在这个局部组件中写一个 props，指的是子组件需要接收父组件传递过来的什么内容？要接收一个 count 这样一个属性的内容，写了 props 后，就可以直接在 template 中通过 {{}} 来引用父组件传递过来的数据了。 -->
+
+    <!-- 在 Vue 中，父组件向子组件传值，都是通过属性的形式来传递的，接下来，我们要把子组件累加的这个功能给他做上去，在子组件 template 中绑定一个点击事件 clickFun，每一次被点击了，执行 count++，到页面上，发现确实好用，但是在控制台有报错，警告不要直接修改父组件传递过来的数据。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-a54b45ea3d1a1e94.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 这是因为在 Vue 中有一个单项数据流的概念，也就是父组件可以通过属性向子组件传递参数，传递的参数可以随便的进行修改，这是没问题的，也就是父组件可以随意的向子组件传递参数，但是子组件绝对不能反过来，去修改父组件传递过来的参数，举例来说，如果父组件自身有一个属性是3，过一会又变成4传递给子组件，这是没有任何问题的，但是传递给子组件，子组件接收到数据后，子组件只能用这个数据，不能去修改，之所以 Vue 中有这个单项数据刘的概念，原因在于，一旦你的子组件接收的这个 count 不是一个基础类型的数据，而是一个类似 object 的引用类型数据，在子组件里改变了一些传递过来的数据内容，有可能接收的这个引用型的数据还被其他的子组件做使用，这样的话，你这个子组件改变了数据，不仅仅影响了自己的组件，还有可能对其他的子组件造成影响，所以 Vue 这个单项数据流，你子组件不能改变父组件的数据，那如果确实要改变这个 count 的这个值该怎么办？ -->
+
+    <!-- 可以在这个子组件中定义一个 data，return 一个对象，可以在这个对象中定义一个名叫 number 的属性，它的初始值是 this.count，也就是，我从父组件接收到一个 count 这样的数据，把 count 数据复制了一份，放到子组件自己的  data 里，这样的话，在下面，我就不用 count 这个内容了，取而代之，我用我自己的 number，当自身被点击的时候，也不去加 count 了，去加自己的 number。 -->
+
+    <!-- 接着继续完善功能，接下来看子组件向父组件传递数据，之前已经讲过了，通过 $.emit()来传递，现在来更深入的讲解一下。 -->
+
+    <div id="app">
+        <counter @change="clickChange" :count="1"></counter>
+        <counter @change="clickChange" :count="2"></counter>
+        <div>{{total}}</div>
+    </div>
+
+    <script>
+        // 创建一个局部组件
+        var counter = {
+            props: ['count'],
+            data: function () {
+                return {
+                    number: this.count
+                }
+            },
+            template: "<div @click='clickFun'>{{number}}</div>",
+            methods: {
+                clickFun: function () {
+                    // this.number++;
+                    this.number = this.number + 2;
+                    this.$emit('change', 2)
+                }
+            }
+        }
+        var app = new Vue({
+            el: "#app",
+            data: {
+                total: 3
+            },
+            components: {
+                counter: counter
+            },
+            methods: {
+                clickChange: function (step) {
+                    this.total += step;
+                }
+            }
+        })
+    </script>
+
+    <!-- 在实例中添加一个放总数的 DOM，在根实例中 data 下可以先将 total 写死，因为两个 count 的初始值分别为 1,2，所以可将 total 先定死为 3，实际上这不是一个正确的写法，目前可以先来做个练习，到后面，可以通过计算属性，避免一些数据的冗余。都按页面上看一下，1,2,3 没有问题。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-5eb4ccc3e2159ff5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 子组件每一次点击的时候，他可以往外携带一些数据，或者说他向父组件传递一下内容，怎么传递呢？子组件向父组件传值，我们通过事件的形式，也就是在子组件被点击的时候，可以通过 this.$emit() 向外触发一个 change 事件，$emit() 中还可以传入第二个参数，或多个参数，“this.$emit('change',1)” 意思是总数加 1，也可以把 “this.number++;” 改为 “this.number = this.number + 2;”，同时，$emit 中第二个参数也要修改为 2,，它的效果就是，每点击一次，就加2，然后需要告诉父组件，每次改变，都增加2，所以在父组件 methods 中添加一个子组件改变数据的方法 clickChange，给他传递一个参数 step，指每一次增加多少，因为子组件中 $emit 传入的是 2，所以 step 也就是 2。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-ef4dacafdd4a3b1e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+</body>
+
+</html>

@@ -14,7 +14,7 @@
         <input type="text" v-model="inputValue">
         <button v-on:click="btnClick">添加</button>
         <ul>
-            <todo-list v-bind:content="item" v-bind:index="index" v-for="(item,index) in list" v-on:="handleItemDelete">
+            <todo-list v-bind:content="item" v-bind:index="index" v-for="(item,index) in list" @delete="handleItemDelete">
             </todo-list>
         </ul>
     </div>

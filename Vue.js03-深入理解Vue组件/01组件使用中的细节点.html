@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>组件使用中的细节</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 1、使用 is 解决 h5 标签上的一些小 bug -->
+    <!-- <div id="app">
+        <table>
+            <tbody>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        Vue.component("row",{
+            template : "<tr><td>this is row</td></tr>"
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+    <!-- 上面代码中，我们创建了一个全局组件 row，并设置了模板 template，然后将这个组件添加到 table 的 tbody 中，这是一个正常的使用组件的方法，但是打开页面，可以看到模板正常显示，结构却不对，tr 渲染到了 tbody 之外。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-2390330e62d9bed3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 这是因为在 h5 规范中，正确结构应该是 table > tbody > tr > td，但是现在将组件 row 加到了 tbody 中，所以元素的结构发生了错乱 -->
+
+    <!-- 接下来看一下如何使用 is 来解决 h5 标签上的 bug，在 tbody 中还是用 tr 标签，将组件的名称放到 is 中去，意思是将 tr 解析为 row 组件。同样在使用 ul 或其他这样标签的时候，也建议用这种方式，以免出现兼容性的错误。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-4cd42cead162d8a6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+
+    <!-- 2、子组件里定义 data 必须是一个函数 -->
+    <!-- 将上面一段代码修改一下，把 td 中的内容放到子组件的 data 中进行存储，看是否能成功渲染出来： -->
+
+    <!-- <div id="app">
+        <table>
+            <tbody>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        Vue.component("row", {
+            data: {
+                content: "this is row"
+            },
+            template: "<tr><td>{{content}}</td></tr>"
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 打开页面，发现报错了，是因为组件中的 data 必须是一个 function，不能是一个对象。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-a07e1a2236761866.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 再修改一下代码，在 function 中返回 content 的值： -->
+    <!-- <div id="app">
+        <table>
+            <tbody>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+                <tr is="row"></tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        Vue.component("row", {
+            data: function () {
+                return {
+                    content: "this is row"
+                }
+            },
+            template: "<tr><td>{{content}}</td></tr>"
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 此时再刷新页面，可以看到数据能正常的显示。 -->
+    <!-- 总结：在子组件里定义 data 的时候，data 必须是个函数，而不能是一个对象，之所以这么设计，是因为一个子组件不像是根组件，只会被调用一次，他可能在不同的地方被调用多次（在例子中我们调用了三次），每一个子组件的数据不希望和其他子组件产生冲突，也就是说每一个子组件都应该有自己的数据，如上例子，每个 row 对应的数据对应的是各自的数据，而不应该共享一套数据，通过一个函数返回对象的目的，就是为了让每一个子组件都有一个独立的数据存储，这样就不会出现多个子组件互相影响的情况。 -->
+
+
+
+    <!-- 3、ref（引用） 的使用 -->
+    <!-- <div id="app">
+        <div ref="hello" v-on:click="clickFun">Hello World!</div>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            methods: {
+                clickFun: function () {
+                    console.log(this.$refs.hello); // <div>Hello World!</div>
+                    console.log(this.$refs.hello.innerHTML); // Hello World!
+                }
+            }
+        })
+    </script> -->
+    <!-- Vue 不建议我们在代码里操作 DOM，但是在处理一些极其发杂的动画效果，你不操作 DOM，光靠 Vue 的数据绑定，有的时候处理不了这样的情况，所以在有一些必要的情况下，还真就得操作 DOM。那么，在 Vue 中如何操作DOM 呢？需要通过 ref 这种引用的形式来获取 DOM并操作。 -->
+
+    <!-- 首先给 div 标签起一个的名字，比如 hello，接着，我的需求是这样的：点击 Div 的时候，把里边的内容打印出来。 -->
+
+    <!-- 在这里，因为给 div 起了一个引用的名字叫 ref，所以当被点击的时候，可以通过 this.$refs.hello 来获取该 DOM 元素，他指的是整个 Vue 实例里所有的引用（可以在 Vue 事例中再添加一个 DOM 元素，并给他设置 ref，打印一下 this.$refs，可以看到这个 DOM 的 ref 值也显示在其中），所有的引用中有一个名叫 hello 的引用，他指向的就是这个 Div 所指向的 DOM 节点，然后就可以通过 innerHMTL 来获取 DOM 元素中的内容了。 -->
+
+    <!-- 到这里会发现，这些之和 DOM 节点有关系，和组件并没有关系，实际上不是这样的，现在的 DIV 是一个标签，在标签上加一个 ref，通过 this.$refs 获取到这个引用的时候，你获取到的是一个 DOM 元素，那假设，这是一个组件呢？如果一个组件上加了 ref，通过 this.$refs.hello 获取到的是什么呢？其实，你获取到的是这个组件带额引用，接下来通过一个计数器的例子再来理解一下 ref。 -->
+
+    <div id="app">
+        <!-- 在父级的组件上使用 counter 这个子组件，如果没有问题，点击他么就会增加。 -->
+        <counter ref="one" @change="clickChange"></counter>
+        <counter ref="two" @change="clickChange"></counter>
+        <!-- 现在想实现一个功能，在福组件中加一个 div 标签，在这里想显示两个 counter 的总数，也就是对两个 counter 进行求和。 -->
+        <div>{{total}}</div>
+    </div>
+    <script>
+        // 创建子组件 counter
+        Vue.component("counter", {
+            template: "<div @click='clickFun'>{{number}}</div>",
+            data: function () {
+                return {
+                    number: 0
+                }
+            },
+            methods: {
+                // 因为在子组件中绑定了一个点击事件 clickFun，所以该事件就应该写到子组件中的 methods 中。
+                clickFun: function () {
+                    this.number++;
+                    // 当子组件数据发生变化的时候，向外触发一个事件（涉及到子组件想福组件传值的内容，可以回顾下第一章），将改事件添加到组件 counter 中，然后去父组件中的 methods 中添加一个 clickChange 方法。
+                    this.$emit("change");
+                }
+            }
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                total: 0
+            },
+            methods: {
+                clickChange: function () {
+                    console.log('change');
+                    // 此时可以发现，点击两个子组件 counter 都可以触发 change 方法，现在只要实现一个求和的功能就行了，接下来就要用到 ref 了。
+
+                    // 给两个子组件都起一个引用（ref）的名字，例如 “ref="one"” 和 “ref="two"”，不管哪个组件发生了改变，最外层的根实例的 clickChange 方法都会被执行。
+                    console.log(this.$refs.one);
+                    console.log(this.$refs.two);
+
+                    // 在父组件中添加一个 DOM 来存放 total 的值，在 data 中给 total 一个默认值 0，通过 ref 获取两个 counter 的 number 值然后计算和并复制给 total。
+                    this.total = this.$refs.one.number + this.$refs.two.number;
+                }
+            }
+        })
+    </script>
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-bc4d85b325fd958f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 这个时候，一个 counter 求和的工作就做完了。 -->
+
+    <!-- 总结：当 ref 是写到一个标签上的时候，通过 “this.$refs.名字”获取到的内容实际上的标签对应的 dom 元素。当在一个组件上写 ref，通过 “this.$refs.名字”获取到的内容实际上 counter 子组件的一个引用。 -->
+
+</body>
+
+</html>
