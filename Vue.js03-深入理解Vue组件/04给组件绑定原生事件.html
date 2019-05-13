@@ -5,332 +5,113 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>组件参数校验与非props特性</title>
+    <title>给组件绑定原生事件</title>
     <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
 </head>
 
 <body>
 
-    <!-- 一、组件的参数校验 -->
-    <!-- 参数校验的几个重点：
-    1、type 类型的校验
-    2、require
-    3、default 默认值的使用
-    4、validator 比较复杂的自定义校验器的使用 -->
+    <!-- 如何给组件绑定原生事件。 -->
 
-    <!-- 接下来通过一个例子看一下怎么进行组件的校验： -->
-    <!-- 首先创建一个名字叫做 child 的子组件，在父组件中去调用这个子组件，直接用 child 就可以了，此时去页面上看，child 就可以显示出来了。 -->
+    <!-- 我们首先编写一个全局的子组件 child，在父组件的模板里先试一下子组件。有的时候我们会在父组件里给 child 绑定一个事件，例如通过 @click 绑定一个 clickFun 事件，然后在父组件的 methods 里编写 clickFun 方法，让他打印一个 "click"。 -->
+
     <!-- <div id="app">
-        <child></child>
+        <child @click="clickFun"></child>
     </div>
     <script>
-        Vue.component('child', {
+        Vue.component("child", {
             template: "<div>Child</div>"
-        });
+        })
         var app = new Vue({
             el: "#app",
-        });
-    </script> -->
-
-    <!-- 1、参数的校验 -->
-    <!-- 有的时候父组件需要往子组件里传递参数，例如我们一般可以在父组件里写一个 content="Hello World!"，通过这种形式，父组件向子组件传递参数，那么组件的校验指的是什么？你父组件向子组件传递了一个内容，那子组件有权对这个内容做一些约束，这些约束我们就可以把它叫做擦书的校验。父组件传递 content，子组件势必就要接收 content，我们先把 content 写到 props 里面，写完之后，就可以在模板里通过插值表达式使用这个 content 了。 -->
-    <!-- <div id="app">
-        <child content="Hello World!"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: ['content'],
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
-    </script> -->
-
-    <!-- 下一步，就会有这样的需求，调用子组件传递的这个 content，我要做一些约束，例如你传递过来的 content 必须是一个字符串，如果有这样的需求该怎么办呢？如果要实现这样的需求，props 里就不写一个数组了，而是写一个对象，对象的键就是接收的参数的名字，叫做 content，可以写一个 String，这么去写的意思是：子组件接收到 content 这个属性必须是一个 String 字符串的类型，那现在父组件调用子组件，传递 content 的时候，“Hello World!”肯定是一个字符串，所以页面上此时不会有任何问题，我们修改一下父组件，让他传递一个数字，如果直接把 “Hello World!” 修改为“123”，那他依然传递的是一个字符串，回忆一下上面的内容，如果传递的是数字，就要在属性前加冒号： -->
-    <!-- <div id="app">
-        <child :content="123"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: {
-                content: String
-            },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
-    </script> -->
-    <!-- 这个时候再到页面上看，content 内容虽然正常渲染了，但是却报了一个警告，说类型检测有问题，子组件希望 content 是一个字符串，但是父组件传递过来的却是 Number -->
-
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-7366ddffccd01ed6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- -->
-
-    <!-- 假设我希望传递过来的是一个数字，该怎么写呢？直接把 String 改为 Number 就可以了: -->
-    <!-- <div id="app">
-        <child :content="123"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: {
-                content: Number
-            },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
-    </script> -->
-
-    <!-- 此时页面就不会报错了。有事还会有这样的需求，我希望传过来的数据既可以是字符串，也可以是数组，这个时候，可以借助数组的语法，把 Number 和 String 放到一个数组里面，它的意思就是，子组件接收的 content 属性，要么是属性，要么是字符串，所以这个时候，传数字或字符串都不会报错。 -->
-    <!-- <div id="app">
-        <child content="Hello World!"></child>
-        <child :content="123"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: {
-                content: [Number, String]
-            },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
-    </script> -->
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-bd91f25efb6a612d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- -->
-
-    <!-- 假设传一个对象呢？ -->
-    <!-- <div id="app">
-        <child :content="{name :'liu'}"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: {
-                content: [Number, String]
-            },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
-    </script> -->
-
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-fd243107ef69497d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- -->
-
-    <!-- 就会报错了，说我期待你传的是一个 Number 或 String，但是你传的却是一个 Object，所以就不对了。通过这个例子，就知道什么是组件参数校验了，也就是子组件接收什么参数，是有规则定义的，当然，这些规则还可以变得更复杂。 -->
-
-    <!-- 2、参数更复杂的校验 -->
-    <!-- content 后面，不仅仅可以跟 Number，String 一个数组，实际上还可以跟一个对象。 -->
-
-    <!-- 2.1、 type -->
-    <!-- 可以写一个 type 加上 String，这个组件接收一个名叫 content 的属性，它的类型必须是 String。 -->
-    <!-- <div id="app">
-        <child :content="{name :'liu'}"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: {
-                content: {
-                    type: String
+            methods: {
+                clickFun: function () {
+                    console.log("click");
                 }
-            },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
+            }
+        })
     </script> -->
-    <!-- 打开页面，会告诉我们传的必须是 String，但真正传入的却是一个 Object，所以会跑出一个警告。 -->
 
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-28750721a99440bc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- -->
+    <!-- 可是，当我们这么写的时候，点击 child 子组件的时候，并不会触发 clickFun 事件，这是因为，当我给子组件绑定一个事件的时候，实际上这个事件绑定的是一个自定义事件，也就是，如果你真正的鼠标点击触发的事件，并不是我绑定的这个事件，如果你想触发这个自定义的 click 事件，你得这么去写： -->
 
-    <!-- 除了 type 还可以写一个 required -->
-
-    <!-- 2.2、 required -->
-    <!-- required 的意思是，我这个子组件，接收 content 这个属性，这个属性是必传的，如果不传 content，看一下： -->
     <!-- <div id="app">
-        <child></child>
+        <child @click="clickFun"></child>
     </div>
     <script>
-        Vue.component('child', {
-            props: {
-                content: {
-                    type: String,
-                    required: true
+        Vue.component("child", {
+            template: "<div @click='childClick'>Child</div>",
+            methods: {
+                childClick: function () {
+                    console.log("childClick");
                 }
-            },
-            template: "<div>{{content}}</div>"
-        });
+            }
+        })
         var app = new Vue({
             el: "#app",
-        });
-    </script> -->
-
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-f343f8646432d927.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- -->
-
-    <!-- 页面报错，告诉你 content 必传，但是现在缺少了这个 content，如果把 required 改为 false，就不会报任何错误了。 -->
-
-    <!-- 除了写 required 之外，还可以写一个 default -->
-
-    <!-- 2.3、 default -->
-
-    <!-- default 可以随便写一些内容，比如 default value -->
-    <!-- <div id="app">
-        <child></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: {
-                content: {
-                    type: String,
-                    required: false,
-                    default: 'default value'
+            methods: {
+                clickFun: function () {
+                    console.log("click");
                 }
-            },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
+            }
+        })
     </script> -->
 
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-3a272c662e3d11e6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-9f693d2c9f095811.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
  -->
 
-    <!-- 可以看到 default value 显示到页面上了。我们这个 child 组件主要接收一个属性，这个属性叫做 content，他不是必填的，也就是这个 content 可传可不传，但是假设你不传，他会使用一个 default 默认值，这个默认值就是 default value，所以你看，在父组件调用子组件的时候，没有传 content，那么子组件里 content 内容就是这个默认的 default value。假设父组件调用子组件的时候，传递了 content，等于一个 “Hello World!”，这个时候，默认值就不会生效了。 -->
+    <!-- 在子组件里，对 template 中的 div 元素进行事件的绑定，这个事件实际上是一个真正的原生事件，例如 “@click='childClick'”，然后在子组件的 methods 中写一个 childClick 方法，让他打印 “childClick”，可以在页面中看到，子组件中的 childClick 方法被触发了，但是外面的这个 clickFun 没有被触发，因为你在这个 div 元素上绑定的事件，指的是监听的原生的事件，而在 子组件 child 上绑定的事件，指的是监听的一个自定义事件，那自定义事件怎么被出发呢？回顾一下子组件向父组件传值的方法 this.$emit，修改一下代码： -->
 
-    <!-- 再来写一个更复杂的校验。 -->
-
-    <!-- 2.3、 default -->
-
-    <!-- 要求 content 这个字符串的长度必须在某个长度之间，例如不能小于 5 位，可以借助 validator 的一个配置项来实现，在 validator 中配置一个函数，他会有个形参叫做 value，可以返回 value.length > 5，然后将 content 里的字符删除剩5个以内的字符。 -->
     <!-- <div id="app">
-        <child content="He"></child>
+        <child @click="clickFun"></child>
     </div>
     <script>
-        Vue.component('child', {
-            props: {
-                content: {
-                    type: String,
-                    required: false,
-                    default: 'default value',
-                    validator: function (value) {
-                        return (value.length > 5);
-                    }
+        Vue.component("child", {
+            template: "<div @click='childClick'>Child</div>",
+            methods: {
+                childClick: function () {
+                    console.log("childClick");
+                    this.$emit("click");
                 }
-            },
-            template: "<div>{{content}}</div>"
-        });
+            }
+        })
         var app = new Vue({
             el: "#app",
-        });
-    </script> -->
-
-    <!-- 意思是，我子组件要接受一个属性，属性的名字叫做 content，类型必须是一个字符串，同时我要对你传入的这个 content 通过校验器做一个校验，这个 value 就是指你传入的内容，我要求传入的这个人字符串长度必须大于5，上面代码中只传入了两个字符，validator 返回 false，所以校验不通过，所以页面报错了，如果大于5就不会报错。 -->
-
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-1b1d489331d719b2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- -->
-
-    <!-- 以上就是组件校验的几个重点，接下来看一下非 props 特性。 -->
-
-
-
-    <!-- 二、非props特性 -->
-
-    <!-- 说道非 props 特性他一定和 props 特性相对应，先来看一下什么是 props 特性 -->
-
-    <!-- 2.1、props 特性 -->
-
-    <!-- 就拿上边的例子来看，props 特性指的是当你的父组件使用子组件的时候，通过属性向子组件传值的时候，恰好子组件里声明了对父组件传递过来的属性的一个接收，也就是说，父组件调用子组件的时候，传递了 content，子组件恰好在 props 里又申明了这个 content，所以父子组件有一个对应关系，如果你这么去写这种形式的属性，我们就把他叫做 props 特性。 -->
-
-    <!-- <div id="app">
-        <child content="He"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            props: {
-                content: {
-                    type: String,
+            methods: {
+                clickFun: function () {
+                    console.log("click");
                 }
-            },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
+            }
+        })
     </script> -->
 
-    <!-- props 特性有什么样的特点呢？打开页面，看一下 DOM 结构， -->
-
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-9560354853218b5c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-386f012d697fb1cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
  -->
 
-    <!-- 可以看到，有一个 div，里边内容 "he"，所以在子组件传递的 content 是不会在 DOM 标签中显示的。 -->
-
-    <!-- props 还有一个特点，当父组件传递了 content，子组件接收了 content 之后，在子组件里就可以直接通过插值表达式，或者通过 this.content 去取得 content 里边的内容了，所以上边这么写，父组件传递了 content 过来，子组件就能把这个内容显示出来，这就叫做 props 特性。 -->
-
-    <!-- 接下来看看什么叫做非 props 特性。 -->
-
-    <!-- 2.2、非 props 特性 -->
-
-    <!-- 非 props 特性指的是，父组件向子组件传递了一个属性，但是子组件并没有 props 这块内容，也就是说子组件并没有申明接收父组件传递过来的内容，如果是这一种情况，我们卡一下页面的效果： -->
-
-    <!-- <div id="app">
-        <child content="He"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            // props: {
-            //     content: {
-            //         type: String,
-            //     }
-            // },
-            template: "<div>{{content}}</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
-    </script> -->
-
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-cb12241fd2da3d99.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
- -->
-
-    <!-- 首先，页面就会报一个错误，说 content 没有被定义，无法使用，这是因为父组件向子组件传递了 content，但是这个时候子组件并没有去接子组件传过来的 content，你不去接收，子组件里就没法使用这个 content，一旦你用，就报错了，这是非 props 特性的第一个情况，就是如果你定义了一个非 props 特性，这个时候 content="he"就是一个非 props 特性。非 props 特性里子组件是没有办法获取到父组件的内容的，因为你压根就没有申明你要获取的内容，所以就没法用。 -->
-
-    <!-- 非 props 特性还有第二个特点，在 template 中不用插值表达式，可以直接写一个 Hello World! -->
+    <!-- 首先当你点 click 的时候，子组件会监听到自身的 div 元素被点击了，然后向外触发一个自定义事件，而你在 child 这个组件里监听了这个事件，所以对应的 clickFun 就会被执行。但是这么写代码实在是太麻烦了，有的时候，有这样的需求，我就想家庭我原生的事件，我就想在 child 这个组件上监听 child 这个组件的原生事件，如果需要两层的传递，太麻烦，再修改一下代码： -->
 
     <div id="app">
-        <child content="He"></child>
+        <child @click.native="clickFun"></child>
     </div>
     <script>
-        Vue.component('child', {
-            // props: {
-            //     content: {
-            //         type: String,
-            //     }
-            // },
-            template: "<div>Hello World!</div>"
-        });
+        Vue.component("child", {
+            template: "<div>Child</div>",
+        })
         var app = new Vue({
             el: "#app",
-        });
+            methods: {
+                clickFun: function () {
+                    console.log("click");
+                }
+            }
+        })
     </script>
 
-    <!-- 如果现在使用的是一个非 props 特性，那么这个非 props 特性实际上实惠显示在 DOM 的属性之中的，我们打开页面看一下： -->
+    <!-- 将子组件中的 methods 删除掉，将 template 中 div 上的绑定事件也删除掉，回到最初的一个状态，如果想监听到原生的事件，可以给 child 中 @click 后加一个修饰符叫做 native，也就是这个时候，在组件上面，我做事件的监听，我监听的并不是自定义事件，而是一个原生的点击事件，此时再到页面上看，点击 child 的时候，click 就可以被正常的显示了，因为监听的已经不是内部组件向外触发的一个事件了，而是原生的点击事件。 -->
 
-    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-7cb7966a6d24f4c1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-f56ca8de6e249aca.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
  -->
 
-    <!-- 可以看到，div 上面有一个 HTML 属性，上面写着 content="He"，很明显，当我们申明一个非 props 特性，它的第二个特点是，这个属性会展示在子组件最外层的 DOM 标签的属性里面。 -->
-
-    <!-- 小结：props 特性要求父组件传，子组件接，然后可以在子组件里直接用父组件传过来的数据，同时 props 特性他不会把属性显示在你的 DOM 标签中，非 props 特性是父组件传，但是子组件不接，那么在子组件里就没法使用父组件传来的数据，同时非 props 特性对应的属性值，其实会显示在子组件最外层的 DOM 标签的属性里面。当然，实际的生产环境中，非 props 特性使用的场景并不是特别的多，这里简要的做一个了解就可以了。  -->
-
+    <!-- 所以，给组件绑定原生事件，非常的简单，只要在事件绑定的后面加一个 native 这样的修饰符，就可以了。 -->
 
 </body>
 
