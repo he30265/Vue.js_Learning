@@ -10,90 +10,40 @@
 </head>
 
 <body>
-
-    <!-- <div id="app">
-        <counter :count="1"></counter>
-        <counter :count="2"></counter>
-
-    </div>
-    <script>
-        var counter = {
-            template: "<div @click='clickFun'>{{number}}</div>",
-            data: function () {
-                return {
-                    number: this.count
-                }
-            },
-            props : ['count'],
-            methods : {
-                clickFun :function (){
-                    this.number ++
-                }
-            }
-        }
-        var app = new Vue({
-            el: "#app",
-            components: {
-                counter: counter
-            }
-        })
-    </script> -->
-
-
-    <!-- <div id="app">
-        <child content="wwww"></child>
-    </div>
-    <script>
-        Vue.component("child", {
-            props: {
-                content: {
-                    type : String
-                }
-            },
-            template: "<div>{{content}}</div>"
-        })
-        var app = new Vue({
-            el: "#app",
-
-        })
-    </script> -->
-
-    <!-- <div id="app">
-        <child content="hh"></child>
-    </div>
-    <script>
-        Vue.component('child', {
-            // props: {
-            //     content: {
-            //         type: String,
-
-            //     }
-            // },
-            template: "<div>Hello World!</div>"
-        });
-        var app = new Vue({
-            el: "#app",
-        });
-    </script> -->
-
     <div id="app">
-        <child @click.native='childClick'></child>
+        <child content="Hello" ></child>
+        <child content="World"></child>
     </div>
     <script>
-        Vue.component("child",{
-            template : "<div>Child</div>"
+        Vue.prototype.bus = new Vue;
+        Vue.component ("child",{
+            props : {
+                content : String
+            },
+            data : function(){
+                return {
+                    childContent : this.content
+                }
+            },
+            template : "<div @click='childClick'>{{this.childContent}}</div>",
+            methods : {
+                childClick : function(){
+                    console.log(this.childContent);
+                    this.bus.$emit('change',this.childContent);
+                }
+            },
+            mounted : function(){
+                var this_ = this;
+                this.bus.$on('change',function(msg){
+                    console.log(msg);
+                    this_.childContent = msg
+                })
+            }
         })
         var app = new Vue({
             el : "#app",
-            methods : {
-                childClick : function(){
-                    console.log('click');
-                }
-            }
         })
     </script>
-
-
 </body>
 
 </html>

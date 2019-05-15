@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>在Vue中使用插槽（slot）</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 插槽这个概念非常的重要，在很多的第三方 Vue 的插件或模块之中都大量的使用了插槽这种特性。 -->
+
+    <!-- 首先来讲一下插槽的使用场景，下面代码中先创建一个子组件，然后在父组件中使用一下子组件，打开页面，子组件会正常显示到页面上，这是没问题的。 -->
+    <!-- <div id="app">
+        <child></child>
+    </div>
+    <script>
+        Vue.component("child", {
+            template: "<div><p>Hello</p></div>"
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 那什么时候会用到插槽呢？假设我有一个需求，我希望子组件里除了 p 标签之外，还要展示一段内容，但是这一段内容并不是我子组件所决定的，而是父组件传递过来的，按照以前的想法，我们可以这么传： -->
+    <!-- <div id="app">
+        <child content="<p>World</p>"></child>
+    </div>
+    <script>
+        Vue.component("child", {
+            props: ['content'],
+            template: "<div><p>Hello</p>{{content}}</div>"
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 上面代码，通过属性的形式向子组件传值，传一个 content 给子组件，子组件要接收这个 props。当接收了这个 content 之后，就可以在 template 中加一个插值表达式，把 content 显示出来啦。到页面上看一下： -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-062ce68c3368b610.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 发现出了一点问题，就是这个 p 标签并没有显示成一个 p 标签，而是被做了一次转义，如果不想做转义怎么办？可以使用之前讲过的一个指令 v-html，我们可以在 content 外加一个 div，然后在 div 上加一个指令 v-html="this.content"。 -->
+
+    <!-- <div id="app">
+        <child content="<p>World</p>"></child>
+    </div>
+    <script>
+        Vue.component("child", {
+            props: ['content'],
+            template: "<div><p>Hello</p><div v-html='this.content'></div></div>"
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 到页面上看一下，这个时候 world 就能被正常的显示出来了，而且如果查看源代码，他就是一个 div 下的 p 标签。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-7888e05fe8b84330.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 这么写代码，他会有一个问题，就是多出了一个 div 标签，如果我只想显示 p 标签呢？使用 template 模板占位符行不行呢？试一下： -->
+
+    <!-- <div id="app">
+        <child content="<p>World</p>"></child>
+    </div>
+    <script>
+        Vue.component("child", {
+            props: ['content'],
+            // template: "<div><p>Hello</p><template v-html='this.content'></template></div>"
+            // 可以使用 ES6 的语法方便阅读
+            template: `<div>
+                       <p>Hello</p>
+                       <template v-html='this.content'></template>
+                       </div>`
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-c768a83b3e68605f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 发现这种情况下模板占位符是不管用的，渲染不出来这个效果，所以通过 content 传值，是有两个问题的，第一个问题，如果想传一个 p 标签，外部必须包裹一个 div。第二个问题，如果 content 里面传递的内容比较少还可以，如果内容很多呢？页面渲染没有问题，但是代码就会变得难以阅读。当子组件有一部分内容是根据父组件传递过来的值显示的时候，可以使用 Vue 提供的一个新的语法，叫做插槽（slot），接下来看看 slot 怎么来用，怎么在父组件向子组件优雅的传递 DOM 的结构，可以这么去写： -->
+
+    <!-- <div id="app">
+        <child>
+            <p>World</p>
+        </child>
+    </div>
+    <script>
+        Vue.component("child", {
+            template: `<div>
+                       <p>Hello</p>
+                       <slot></slot>
+                       </div>`
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 可以在 child 内部写一个 p 标签，内容 World，子组件就需要有办法用到这个内容，子组件的模板里 Vue 内置了一个新的语法叫做 slot 语法，slot 这个标签显示的内容就是父组件向子组件插入进来的这段 p 标签，打开页面，可以看到 Hello 和 World 都正常显示出来了，而且各自的外部没有 div。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-5a39da5c8494eea5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 所以通过插槽，我们可以更方便的向子组件传递 dom 元素，同时子组件使用这个插槽的内容也非常的简单，通过 slot 来用就可以了，当然 slot 还有一些新的特性，我们可以在 slot 中写一些默认的值，比如去掉 child 中的内容，在 slot 中写“默认内容”： -->
+
+    <!-- <div id="app">
+        <child></child>
+    </div>
+    <script>
+        Vue.component("child", {
+            template: `<div>
+                       <p>Hello</p>
+                       <slot>默认内容</slot>
+                       </div>`
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-50ad089b6898e7a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 所以 slot 这个插槽还可以定义默认值。 -->
+
+    <!-- 假设现在又有一个新的需求，这个需求很常见，比如我有一个 body-content 组件，整个页面的内容我都放到 body-content 这个组件里来做，body-content 组件里先不用 slot， 先写一个区域，给他一个 class，比如就叫 content。现在需求是这样的：这个 body-content 组件里显示的内容，内容区域是由我这个组件决定的，但是他的 header 和 footer 是由外部传递进来的。通过 slot 传递一个 header 和 footer，这两个组价的很多内容不是由我自己决定的，而是有由外部传递进来的。我在 template 中谢了两个 slot，可以往插槽里传东西，可以在 body-content 中写两个 div，分别是 header 和 footer，然后给这两个插槽起名字（也叫具名插槽 slot=""），然后在子组件中去用这里鞥个插槽，加一个 name=""，就行了。 -->
+    <div id="app">
+        <body-content>
+            <div class="header" slot="header">header</div>
+            <div class="footer" slot="footer">footer</div>
+        </body-content>
+    </div>
+    <script>
+        Vue.component("body-content", {
+            template: `<div>
+                       <slot name="header"></slot>
+                       <div class='content'>content</div>
+                       <slot name="footer"></slot>
+                       </div>`
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script>
+
+    <!-- 到页面上，可以看到显示了 header、content、footer -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-94aabe78dd931b27.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 小结：插槽只有一个，具名插槽可以有多个，同时具名插槽也是可以有默认值的。 -->
+
+
+
+
+</body>
+
+</html>
