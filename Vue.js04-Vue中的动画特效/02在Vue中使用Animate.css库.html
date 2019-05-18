@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>在Vue中使用Animate.css库</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 这一节来讲解 Vue 中更复杂的动画效果。首先进入上一节最终的那段代码，并对这段代码进行一个变更。上一节是讲了 transition 的使用方法，这一节看一下 keyframes 形式的动画。 -->
+
+    <!-- 回忆一下 fade-enter-active 和 fade-leave-active 这两个 class 是什么时候生效的，当 div 标签在显示的这个过程中，fade-enter-active 是一直存在的，当他在隐藏的过程中，fade-leave-active 是一直存在的，根据这个特性可以这样写动画效果： -->
+
+    <!-- <style>
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.5);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .fade-enter-active {
+            transform-origin: left center;
+            animation: bounce-in 1s;
+        }
+
+        .fade-leave-active {
+            transform-origin: left center;
+            animation: bounce-in 1s reverse;
+        }
+    </style>
+    <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition name="fade">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 上面代码定义了一个 keyframes 的一个 CSS3 动画 bounce-in，分别设置 0%、50%、100% 时 的状态，然后在 fade-enter-active 和 fade-leave-active 中就可以用这个动画了。打开页面可以看到，点击 toggle，隐藏时候有放大缩小的效果，显示的时候也有放大缩小的效果。 -->
+
+    <!-- 上面就讲解了在 Vue 中如何使用 keyframes 这种形式的 CSS3 动画。接着再讲一个知识点，当你使用 transition 标签的时候，给了一个 name="fade"，那么他就会都自动的添加 fade-enter-active 和 fade-leave-active 这样的 class 名字。那我能不能定义一个就叫 enter 或 leave 这样的一个名字，不用他默认提供的命名的规范？是可以的，如果想这么写，只需要在 transition 外面自定义这个 class 名字，如下面代码： -->
+    <!-- <style>
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.5);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .enter {
+            transform-origin: left center;
+            animation: bounce-in 1s;
+        }
+
+        .leave {
+            transform-origin: left center;
+            animation: bounce-in 1s reverse;
+        }
+    </style>
+    <div id="app">
+        <button @click="clickFun">change</button>
+        <transition name="fade" enter-active-class="enter" leave-active-class="leave">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 可以看到效果是一样的，不会有任何问题，到这里就可以知道，其实你可以自定义添加的 class 名字。 -->
+
+    <!-- 现在既然可以自定义 fade-enter-active 和 fade-leave-active 名字，那借助这个功能我们就可以在我们的 Vue 项目里使用比较流行的 animate.css 库了，我们可以进入 [animate.css 官网](https://daneden.github.io/animate.css/)，在这里去查看对应动画的 class 名，然后添加 class 名。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-a9611b84dbd894c9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 下载 animate.css 文件并引用，我直接用了 BootCDN 的方式在项目中引用了 animate.css。引用了 animate.css 我就不需要自己写动画效果了，然后在入场动画和出场动画的 class 中添加 animated，并在后边更上对应动画效果的 class 名，例如下面代码： -->
+    <link href="https://cdn.bootcss.com/animate.css/3.7.0/animate.css" rel="stylesheet">
+    <div id="app">
+        <button @click="clickFun">change</button>
+        <transition name="fade" enter-active-class="animated bounce" leave-active-class="animated flash">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script>
+
+    <!-- 如果想使用 animate.css 这个库，有几点需要注意：第一点是你必须使用自定义 class 名字的形式来使用 animate.css，第二是 class 类里面必须得包含一个 animate 这样一个具体的类，然后根据需求的不同添加不同动画的类名。 -->
+
+
+</body>
+
+</html>

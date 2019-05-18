@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>test</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <link href='https://cdn.bootcss.com/animate.css/3.7.0/animate.css' rel='stylesheet'>
+
+    <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition name="fade" enter-active-class="animated flash" leave-active-class="animated flash">
+            <div v-if="show">Hello world</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script>
+
+
+
+
+</body>
+
+</html>

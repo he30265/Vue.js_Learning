@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动态组件与v-once指令</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 1、动态组件 -->
+
+    <!-- 先创建两个组件 child-one 和 child-two，然后在父组件中使用它们，然后再加一个 button，我希望当点击 button 的时候，一会 child-one 显示，一会儿 child-two 显示，也就是他俩做一个 toggle 的效果，我们可以通过如下方式实现： -->
+    <!-- <div id="app">
+        <child-one v-if="show === 'child-one'"></child-one>
+        <child-two v-if="show === 'child-two'"></child-two>
+        <button @click="clickFun">change</button>
+    </div>
+    <script>
+        Vue.component("child-one", {
+            template: "<div>child-one</div>"
+        })
+        Vue.component("child-two", {
+            template: "<div>child-two</div>"
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: 'child-one'
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = this.show === 'child-one' ? 'child-two' : 'child-one'
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 上面是一种写法，当然除了这种写法，通过动态组件的形式来编写这段代码，可以将两个组件 child-one 和 child-two 去掉，然后写一个 component 这样的一个标签，这个标签是 Vue 中自带的一个标签，他值得就是有个动态组件，然后他有一个属性叫做 is，我让 is 绑定绑定一个数据，这个数据就是 show。 -->
+    <!-- <div id="app">
+        <component :is="show"></component>
+        <button @click="clickFun">change</button>
+    </div>
+    <script>
+        Vue.component("child-one", {
+            template: "<div>child-one</div>"
+        })
+        Vue.component("child-two", {
+            template: "<div>child-two</div>"
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: 'child-one'
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = this.show === 'child-one' ? 'child-two' : 'child-one'
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 打开页面，可以看到效果和上一段代码一样。动态组件的意思就是，他会根据 is 里面数据的变化自动的加载不同的组件，比如一开始进来，show 的值是 child-one，他就会显示 child-one 这个组件，当点击按钮了，child-one 变成了 child-two，这个时候，动态组件发现 is 里的数据变成了 child-two，那他就会自动的吧 child-one 销毁掉，去显示 child-two 这个组件，这就叫做 Vue 中的动态组件。 -->
+
+    <!-- 接下来再讲一个知识点，v-once指令 -->
+
+    <!-- 2、v-once指令 -->
+
+    <!-- 依然看上一段代码，我们每一次切换的时候，实际上 Vue 的底层会判断这个组件这个组件现在已经不用了，取而代之我要用另一个组件，然后他就会把第一个组件销毁，再创建第二个组件，假设第二个组件要隐藏，第一个组件又显示的话，这个时候再把第二个组价销毁掉再创建一个第一个组件，也就是每一次切换，底层都需要销毁一个组件，再创建一个组件，这种操作其实耗费了一定的性能的，那如果，我们的组件内容每次都一样，可以在子组件上面加一个 v-once 指令，这样的话，有一个好处，当 child-one 这个组件第一次被渲染的时候，因为这个组件上有一个 v-once 指令，所以他直接就放到内存里了，当点击切换，child-two 第一次展示到页面上，他也会被放到内存里，当再点击切换到额时候，并不需要重新创建一个组件，而是从内存里直接拿出以前的组件就可以了，它的性能更高一些，所以在 Vue 之中，通过 v-once 指令可以有效的提高一些静态内容的展示效率。 -->
+
+    <div id="app">
+        <child-one v-if="show === 'child-one'"></child-one>
+        <child-two v-if="show === 'child-two'"></child-two>
+        <button @click="clickFun">change</button>
+    </div>
+    <script>
+        Vue.component("child-one", {
+            template: "<div v-once>child-one</div>"
+        })
+        Vue.component("child-two", {
+            template: "<div v-once>child-two</div>"
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: 'child-one'
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = this.show === 'child-one' ? 'child-two' : 'child-one'
+                }
+            }
+        })
+    </script>
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

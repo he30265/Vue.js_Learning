@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue中的作用域插槽</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+</head>
+
+<body>
+
+    <!-- 接着上一章的内容，这一节来讲 Vue 中的作用域插槽。 -->
+
+    <!-- 先创建一个名字叫做 child 的子组件，添加模板，然后在父组件中使用这个子组件，然后打开页面，显示 Child 没有问题。 -->
+    <!-- <div id="app">
+        <child></child>
+    </div>
+    <script>
+        Vue.component("child", {
+            template: "<div>Child</div>"
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 那什么是作用域插槽呢？下面举一个具体的例子：Child 这个子组件要实现一个功能，去循环显示一个列表，那么就在子组件里定义一组数据，在 template 中使用 v-for 循环显示一个列表. -->
+    <!-- <div id="app">
+        <child></child>
+    </div>
+    <script>
+        Vue.component("child", {
+            data: function () {
+                return {
+                    list: [1, 2, 3, 4]
+                }
+            },
+            template: `
+                <div>
+                    <ul>
+                        <li v-for="item of list">{{item}}</li>
+                    </ul>
+                </div>
+            `
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script> -->
+
+    <!-- 打开页面，可以看到1、2、3、4被正常的显示了。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-dbaa303e9be915a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 接下来，我有一个需求，child 这个组件有可能在很多的地方被调用，我希望在不同的地方调用 child 组件的时候，这个列表到底怎么循环，这个样式不是我这个 child 组件所控制的，而是外部告诉我们这个组件选项应该如何渲染，也就是我们的代码要把这个 li 标签去掉，取而代之写一个 slot，然后通过 v-for 做一个循环，然后传一个内容进去，传一个 item 进去，等于 item，这段代码的意思是，我这个 child 组件去做一个列表的循环，但是列表项中的每一项怎么显示，我并不关心，具体怎么显示，由外部你来告诉我怎么显示。 -->
+
+    <!-- 很显然，是外部的这个 child 调用的他，那么你就需要往子组件传递一个 slot，告诉子组件你该怎么显示列表的每一项。首先，一定要在外层套一个 template，这是一个固定的写法，同事同时要写一个 slot-scope=""，引号里的属性值可以随便定义，例如写 props，它的意义是，当子组件用 slot 的时候，会往 slot 里传递一个 item 这样一个数据，那么我们在上面用 child 的时候，就可以用这个 item　数据，item 就写在 slot-scope 后跟的设个属性中，在 li 标签中通过插值表达式的形式渲染。看下边代码： -->
+    <div id="app">
+        <child>
+            <template slot-scope="props">
+                <li>{{props.item}}</li>
+            </template>
+        </child>
+    </div>
+    <script>
+        Vue.component("child", {
+            data: function () {
+                return {
+                    list: [1, 2, 3, 4]
+                }
+            },
+            template: `
+                    <div>
+                        <ul>
+                            <slot v-for="item of list" :item=item>{{item}}</slot>
+                        </ul>
+                    </div>
+                `
+        })
+        var app = new Vue({
+            el: "#app"
+        })
+    </script>
+
+    <!-- 打开页面，没有任何问题，1、2、3、4正常的渲染到页面上。这这样，每一项显示什么就不是由子组件决定了，而是父组件调子组件的时候给子组件传递对应的模板，这就是作用域插槽的一个使用。 -->
+
+    <!-- 从头看一下这段代码，首先父组件调用子组件的时候给他传了一个插槽，这个插槽叫做作用域插槽，作用域插槽必须是一个 template 开头和结尾的一个内容，同时这个插槽要声明子组件接受的数据都放在哪（例子中放到了 props 里），同时还要告诉子组件一个模板的信息，接收到 props 应该如何展示。 -->
+
+    <!-- 什么时候使用作用域插槽呢？当子组件做循环，它的 dom 结构应该由外部传递进来的时候，这个时候我们去用作用于插槽。使用作用域插槽，子组件可以向父组件的插槽里面传数据，父组件传递过来的这个插槽如果想接收数据，必须在外层使用一个 template，同时通过 slot-scope 对应的属性的名字来接收传递过来的数据。上面代码，我传递一个 item 过来，在父组件的作用域插槽里面就可以接收到这个 item。 -->
+
+
+
+
+</body>
+
+</html>
