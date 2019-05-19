@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>在Vue中同时使用过渡和动画</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+    <link href='https://cdn.bootcss.com/animate.css/3.7.0/animate.css' rel='stylesheet'>
+</head>
+
+<body>
+
+    <!-- 我们在上一节最终的代码上看一下，注意要引入 animate.css。使用 animate.css 和 @keyframes 是没有区别的，animate.css 其实就是一个封装。 -->
+    <!-- <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition name="fade" enter-active-class="animated swing" leave-active-class="animated jello">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 当我们打开页面的时候，也就是元素第一次显示的时候，其实这个动画并没有被添加上，那如果我想在元素第一次显示的时候，我的这个 “Hello Word!” 也具备动画效果，应该怎么做呢？ -->
+
+    <!-- 我们在 transition 中增加一个自定义名字叫做 appear-active-class="animated swing"，就这样写是不行的，如果想使用 appear-active-class 的话，记得在上面再写一个属性叫做 appear，意思是第一次显示这个内容的时候，也有一个动画效果，它的动画效果是使用了 animated 库中的一个动画。 -->
+
+    <!-- <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition name="fade" appear enter-active-class="animated swing" leave-active-class="animated jello"
+            appear-active-class="animated jello">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 这个时候刷新页面，可以看到第一次显示元素的时候就有一个动画效果，隐藏没问题，显示也没问题，都有动画效果。 -->
+
+    <!-- 在上面这个例子中，实际上我们只用到了一种动画，就是 animate.css 库提供的动画。假设入场动画不仅有 css3 的动画效果，还有一个过渡的动画效果，怎么做呢？ -->
+
+    <!-- 在 enter-active-class 中添加一个 fade-enter-active，在 leave-active-class 中添加一个 fade-leave-active，然后给新添加的这两个 class 名添加属性，回忆一下第一节添加 transition 的方法。 -->
+
+    <!-- <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 3s;
+        }
+    </style>
+    <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition name="fade" appear enter-active-class="animated swing fade-enter-active"
+            leave-active-class="animated jello fade-leave-active" appear-active-class="animated swing">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 打开页面点击按钮可以看到，此时元素既有 animate 动画效果，也有 transition 透明度的变化效果，所以把两个动画结合到了一起做了一个使用。 -->
+
+    <!-- 但是会发现这样一个问题，opacity 动画执行的是 3s，但是 animate.css 这个动画执行的是几呢？我们可以从 animate.css 源码中查看一下： -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-4b0e42da1c473031.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 可以看到 animate.css 动画执行的时间是 1s，那整个的动画效果到底是怎么算呢？是 1s 所有动画都结束，还是 3s 所有动画都结束？Vue 也不清楚哪一个是结束时长，这个时候我们可以手动的去设置，我们现在已 3s 这个比较长的时间作为动画时间，直接在 transition 标签中写 type="transition" 就可以了： -->
+    <!-- <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 3s;
+        }
+    </style>
+    <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition type="transition" name="fade" appear enter-active-class="animated swing fade-enter-active"
+            leave-active-class="animated jello fade-leave-active" appear-active-class="animated swing">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+    <!-- 它的意思是，我的这个动画既有 animate 就是普通的这种 keyframe 形式的动画，又有 transition 这种形式的动画，我的动画时长以 transition 的动画时长为准，他就会以 3s 作为整个动画的执行时间。到页面上，点击按钮，可以看到 3s 动画结束。这样我们就确定了我们动画的播放时长。 -->
+
+    <!-- 现在是以过渡效果的时长作为动画的总时长，那能不能我自己定义一个动画执行的总时长呢？这个时长是可以进行自定义的，可以在 transition 标签中这么写： -->
+    <!-- <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 3s;
+        }
+    </style>
+    <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition :duration="5000" name="fade" appear enter-active-class="animated swing fade-enter-active"
+            leave-active-class="animated jello fade-leave-active" appear-active-class="animated swing">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 上面代码，我在 transition 标签中添加了一个 :duration属性，值设置为 5000，意思是我让这个动画的执行时长是 5s。回到浏览器上，怎么才能看到效果呢？我们可以查看元素，点击 toggle，3s 后元素其实已经隐藏掉了，但是这个动画并没有执行完，fade-leave-active 和 fade-leave-to 还都在，等 5s 后才会消失。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-18ce9405a3b42b7d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 现在是自定义了一个动画的时长，其实这个时长还可以设置的复杂一点，可以设置一个入场动画的时长和一个出场动画的时长，例如入场设置为 5s，出场设置为 10s。 -->
+    <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enter-active,
+        .fade-leave-active {
+            transition: opacity 3s;
+        }
+    </style>
+    <div id="app">
+        <button @click="clickFun">toggle</button>
+        <transition :duration="{enter:5000,leave:10000}" name="fade" appear
+            enter-active-class="animated swing fade-enter-active" leave-active-class="animated jello fade-leave-active"
+            appear-active-class="animated swing">
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                clickFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script>
+    <!-- 打开页面，点击按钮，查看元素，可以看到元素入场的时长为 5s，出场的时长为 10s。 -->
+
+</body>
+
+</html>

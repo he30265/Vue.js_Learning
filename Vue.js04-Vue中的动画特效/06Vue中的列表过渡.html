@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue中的列表过渡</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+
+
+</head>
+
+<body>
+
+    <!-- 我们先来实现这样一个功能：显示一个列表项，这个列表项循环显示数组中的内容，这个数组里的内容是通过点击一次按钮，加一次数据。 -->
+
+    <!-- <div id="app">
+        <button @click="clickAddFun">Add</button>
+        <div v-for="item of list" :key="item.id">{{item.title}}</div>
+    </div>
+    <script>
+        var count = 0;
+        var app = new Vue({
+            el: "#app",
+            data: {
+                list: []
+            },
+            methods: {
+                clickAddFun: function () {
+                    this.list.push({
+                        id: count++,
+                        title: "Hello World!"
+                    })
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 打开页面，可以看到，每点一次按钮，就会新增一个 “Hello World!”。以前我们做动画效果的时候，只能做对单个元素的隐藏或显示，或者说对多个元素来回切换做隐藏或显示效果。那怎么对列表做一个过渡效果呢？ -->
+
+    <!-- 这个时候给大家讲解一个新的标签，叫做 transition-group，我们把要循环的元素放到这个标签中，然后需要写一个 css 过渡的内容，方法和之前一样： -->
+    <style>
+        .v-enter,
+        .v-leave-to {
+            opacity: 0;
+        }
+
+        .v-enter-active,
+        .v-leave-to {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="clickAddFun">Add</button>
+        <transition-group>
+            <div v-for="item of list" :key="item.id">{{item.title}}</div>
+        </transition-group>
+    </div>
+    <script>
+        var count = 0;
+        var app = new Vue({
+            el: "#app",
+            data: {
+                list: []
+            },
+            methods: {
+                clickAddFun: function () {
+                    this.list.push({
+                        id: count++,
+                        title: "Hello World!"
+                    })
+                }
+            }
+        })
+    </script>
+
+    <!-- 打开页面，可以看到每次点击后添加内容的时候都有一个渐现的效果，它的原理是什么呢？其实可以这样理解： -->
+    <transition-group>
+        <div>Hello World!</div>
+        <div>Hello World!</div>
+        <div>Hello World!</div>
+    </transition-group>
+    <!-- 相当于： -->
+    <transition>
+        <div>Hello World!</div>
+    </transition>
+    <transition>
+        <div>Hello World!</div>
+    </transition>
+    <transition>
+        <div>Hello World!</div>
+    </transition>
+
+    <!-- 给列表外层加一个 transition-group 标签，相当于给列表的每一项都加一个 transition 标签。 -->
+
+
+
+</body>
+
+</html>

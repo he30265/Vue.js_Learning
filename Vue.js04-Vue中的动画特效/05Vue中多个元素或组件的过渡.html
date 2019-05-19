@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue中多个元素或组件的过渡</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+
+
+</head>
+
+<body>
+
+    <!-- 1、多个元素的过渡 -->
+
+    <!-- 之前讲的是一个元素的过渡动画，这一节来讲一下 Vue 中多个元素或组件的过渡。 -->
+
+    <!-- 在 transition 这个标签内，我们再加一个元素，通过 v-if 和 v-else 的形式来确定显示与否，然后再添加一个过渡动画，希望有一个渐隐渐现的效果： -->
+    <!-- <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enetr-active,
+        .fade-leave-active {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade">
+            <div v-if="show">Hello World!</div>
+            <div v-else>Bye World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+    <!-- 但是我们打开页面，切换效果是有的，但是渐隐渐现的效果并没有实现，原因是，Vue 在这两个元素进行切换的时候，他会尽量的复用 DOM，座椅导致这种动画不会出现，如果让 Vue 不去复用 DOM 的话，该怎么解决呢？我们回忆一下 Vue.js第2课 中的第7章讲过的 key 值，在那个例子中，有两个 input 框，因为 Vue 中 DOM 复用的机制，导致在控制台修改 data 后，input 框切换了，但是里边的值还是保持着上一个输入框输入的内容，我们通过给每一个 input 框设置一个属于自身的 key 值，就可以解决这个问题，这里也一样，给两个元素分别设置一个 key 值。 -->
+
+    <!-- <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enetr-active,
+        .fade-leave-active {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade">
+            <div v-if="show" key="hello">Hello World!</div>
+            <div v-else key="bye">Bye World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 此时打开页面，可以看到渐隐渐现动画效果也实现了。 -->
+
+    <!-- 实际上 Vue 在 transition 上还给我们提供了一个参数 mode，来设置多个属性切换时的一个效果，如果把 mode 设置为 in-out，就是要显示的元素先显示，要隐藏的元素再隐藏，反过来，out-in 就是要隐藏的元素先隐藏，要显示的元素再显示，看下边代码： -->
+    <!-- <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enetr-active,
+        .fade-leave-active {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" mode="out-in">
+            <div v-if="show" key="hello">Hello World!</div>
+            <div v-else key="bye">Bye World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 以上就是对个元素的过渡，下面在来看一下多个组件的过渡。 -->
+
+
+    <!-- 2、多个组件的过渡 -->
+
+    <!-- 创建两个组件，并在 transition 中使用这两个组件： -->
+    <!-- <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enetr-active,
+        .fade-leave-active {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" mode="out-in">
+            <child v-if="show"></child>
+            <child-one v-else></child-one>
+        </transition>
+    </div>
+    <script>
+        Vue.component("child", {
+            template: "<div>Hello World!</div>"
+        })
+        Vue.component("child-one", {
+            template: "<div>Bye World!</div>"
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                }
+            }
+        })
+    </script> -->
+    <!-- 打开页面，可以看到渐隐渐现的动画效果是没有问题的，这样就实现了多个组件的过渡效果，如果改为动态组件呢？ -->
+
+    <!-- 我们先来回忆一下 Vue.js第3课第八章中讲过的动态组件，如果兄弟组件之间是通过 v-if、v-else 的方式进行判断显示的，那就可以使用 component 标签添加 :is 属性和判断条件，来显示不同的组件。接下来按照动态组件的方式修改一下上面代码： -->
+    <style>
+        .fade-enter,
+        .fade-leave-to {
+            opacity: 0;
+        }
+
+        .fade-enetr-active,
+        .fade-leave-active {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" mode="out-in">
+            <component :is="type"></component>
+        </transition>
+    </div>
+    <script>
+        Vue.component("child", {
+            template: "<div>Hello World!</div>"
+        })
+        Vue.component("child-one", {
+            template: "<div>Bye World!</div>"
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                type: "child"
+            },
+            methods: {
+                toggleFun: function () {
+                    this.type = this.type === "child" ? "child-one" : "child"
+                }
+            }
+        })
+    </script>
+
+</body>
+
+</html>

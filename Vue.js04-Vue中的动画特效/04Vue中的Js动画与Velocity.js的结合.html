@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue中的Js动画与Velocity.js的结合</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+
+
+</head>
+
+<body>
+
+    <!-- 1、js 动画 -->
+
+    <!-- 以前将动画的时候都是通过 css 来实现一个动画效果，那有办法通过 js 实现一些动画效果么？其实也是有的。Vue 给我们提供了很多 js 动画的钩子，我们可以这样去用： -->
+    <!-- <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" @before-enter="handleBeforeEnter" @enter="handleEnetr" @after-enter="handleAfterEnetr">
+            <div v-show="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                },
+                handleBeforeEnter: function (el) {
+                    el.style.color = "red"
+                },
+                handleEnetr: function (el, done) {
+                    setTimeout(function () {
+                        el.style.color = "blue";
+                        done();
+                    }, 2000);
+
+                },
+                handleAfterEnetr: function (el) {
+                    el.style.color = "black"
+                }
+            }
+        })
+    </script> -->
+    <!-- 上面代码，在 transition 中绑定了一些事件 @before-enetr、@enetr、@after-enter，并在 methods 中编写这些函数，这些函数都会接受一个参数 el，这个 el 指的就是 transition 动画包裹的这个标签，那就直接可以通过 el.style 给他设置样式了。 -->
+
+    <!-- 再来看第二个钩子函数 enter，这个钩子和 before-enter 稍有差异，他会接受两个参数，第一个是 el，第二个是一个 done 回调函数，enter 这个钩子当 before-enter 被触发结束后，下一步就是要真正的运行动画了，当真正运行动画的时候，实际上所有的动画都写在 enter 这个钩子对应的函数中。例如上面我在 handleEnter 中通过延时器编写一个 2s 后变色的效果，此时，页面的一个效果就是：点击显示后，元素的颜色开始是红色，接着动画执行，2s 后变为蓝色。在 handleEnetr 这个函数中，done 这个回调函数也很重要，当动画结束的时候，要手动的调一下 done 这个回调函数，相当于你告诉 Vue 这个动画已经执行完了。 -->
+
+    <!-- 当 done 被调用之后，Vue 又会触发一个事件，这个事件的名字叫 after-enter，可以写一个对应的处理函数，叫做 handleAfterEnetr，这个函数中，我们可以让元素的颜色恢复成黑色。但是此时页面上的效果是他没有变蓝，而是直接变成了黑色，这是因为在 handleEnetr 中，我们设置了 2s 动画就结束了，红色变为蓝色后，马上就变为了黑色，为了看的更清楚一些，可以这么写： -->
+    <!-- <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" @before-enter="handleBeforeEnter" @enter="handleEnetr" @after-enter="handleAfterEnetr">
+            <div v-show="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                },
+                handleBeforeEnter: function (el) {
+                    el.style.color = "red"
+                },
+                handleEnetr: function (el, done) {
+                    setTimeout(function () {
+                        el.style.color = "blue";
+                    }, 2000);
+                    setTimeout(function () {
+                        done();
+                    }, 4000)
+                },
+                handleAfterEnetr: function (el) {
+                    el.style.color = "black";
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 上边设置了 4s 后动画才结束，所以此时页面上的效果就是先变红，2S 后变蓝，再过两秒后变黑，动画结束。上面讲了入场动画，那么出场动画呢？出场动画的钩子函数是 before-leave、leave、after、leave，他们的用法和 enter 是一致的，我们可以做个测试： -->
+    <!-- <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" @before-leave="handleBeforeLeave" @leave="handleLeave" @after-leave="handleAfterLeave">
+            <div v-show="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                },
+                handleBeforeLeave: function (el) {
+                    el.style.color = "red"
+                },
+                handleLeave: function (el, done) {
+                    setTimeout(function () {
+                        el.style.color = "blue";
+                    }, 2000);
+                    setTimeout(function () {
+                        done();
+                    }, 4000)
+                },
+                handleAfterLeave: function (el) {
+                    el.style.color = "black";
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 以上就是实现了 js 的动画，接下来介绍一种 js 常用的一个动画库。  -->
+
+
+    <!-- 2、Velocity.js 动画库 -->
+
+    <!-- 去 [Velocity.js 官网](http://velocityjs.org/) 下载并查看 API 文档。我这里直接用 BootCDN 方式引用了。 -->
+
+    <!-- 接下来我们借助 Velocity.js 来实现一些动画效果。首先把我们自己写的动画效果删掉，当动画还没执行时，我们在 handleBeforeEnter 先设置元素的 opacity 为 0，也就是还没有入场的时候透明度为 0，动画开始执行，走到 handleEnetr 的时候，我希望将元素的透明度慢慢变为 1，通过 Velocity() 来写，第一个参数传 el，第二个参数写变化的结果，第三个参数写这个动画变化的时间，例如：Velocity(el,{opacity:1},{duration:1000}); -->
+
+    <script src='https://cdn.bootcss.com/velocity/2.0.5/velocity.js'></script>
+    <div id="app">
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" @before-enter="handleBeforeEnter" @enter="handleEnetr" @after-enter="handleAfterEnetr">
+            <div v-show="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleFun: function () {
+                    this.show = !this.show
+                },
+                handleBeforeEnter: function (el) {
+                    el.style.opacity = 0
+                },
+                handleEnetr: function (el, done) {
+                    Velocity(el, {
+                        opacity: 1
+                    }, {
+                        duration: 1000,
+                        complete: done
+                    });
+                },
+                handleAfterEnetr: function (el) {
+                    console.log("动画结束！")
+                }
+            }
+        })
+    </script>
+
+    <!-- 此时到页面上来看一下，从隐藏到显示，会有一个渐现的效果。但是这个效果这么执行完其实是有问题的，我们先看一下 Velocity 的官网，在右侧导航找到一个 Complete 参数： -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-4c4d9c23a80801a1.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 这里有一个 complete 配置参数，我们在 duration 后面加一个 complete 配置参数，里面加一个 done 函数，他的意思是，当 Velocity 执行完这个动画之后，complete 这个属性对应的内容会被自动的执行，也就是 done 这个函数会被自动的执行，告诉 Vue 我的动画执行完成了，接下来 handleAfterEnet 这个函数就会被执行，可以让他打印一个 “动画结束！”。可以试一下，如果不设置 complete 这个参数，那么他就永远不会执行 handleAfterEnet 这个方法，也就永远不会结束。 -->
+
+    <!-- 以上就讲解了 Vue 中如何使用 js 的钩子实现 js 动画效果，和 Velocity.js 动画库的使用。 -->
+
+
+</body>
+
+</html>

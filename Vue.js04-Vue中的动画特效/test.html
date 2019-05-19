@@ -10,13 +10,11 @@
 </head>
 
 <body>
-
-    <link href='https://cdn.bootcss.com/animate.css/3.7.0/animate.css' rel='stylesheet'>
-
+    <script src='https://cdn.bootcss.com/velocity/2.0.5/velocity.js'></script>
     <div id="app">
-        <button @click="clickFun">toggle</button>
-        <transition name="fade" enter-active-class="animated flash" leave-active-class="animated flash">
-            <div v-if="show">Hello world</div>
+        <button @click="toggleFun">toggle</button>
+        <transition name="fade" @before-enter="handleBeforeEnter" @enter="handleEnter" @after-enter="handleAfterEnetr">
+            <div v-if="show">Hello</div>
         </transition>
     </div>
     <script>
@@ -26,13 +24,26 @@
                 show: true
             },
             methods: {
-                clickFun: function () {
+                toggleFun: function () {
                     this.show = !this.show
+                },
+                handleBeforeEnter: function (el) {
+                    el.style.opacity = 0
+                },
+                handleEnter: function (el, done) {
+                    Velocity(el, {
+                        opacity: 1
+                    }, {
+                        duration: 1000,
+                        complete: done
+                    })
+                },
+                handleAfterEnetr: function (el) {
+                    console.log("动画结束")
                 }
             }
         })
     </script>
-
 
 
 
