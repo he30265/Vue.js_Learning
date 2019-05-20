@@ -49,7 +49,7 @@
             }
         })
     </script> -->
-    <!-- 但是我们打开页面，切换效果是有的，但是渐隐渐现的效果并没有实现，原因是，Vue 在这两个元素进行切换的时候，他会尽量的复用 DOM，座椅导致这种动画不会出现，如果让 Vue 不去复用 DOM 的话，该怎么解决呢？我们回忆一下 Vue.js第2课 中的第7章讲过的 key 值，在那个例子中，有两个 input 框，因为 Vue 中 DOM 复用的机制，导致在控制台修改 data 后，input 框切换了，但是里边的值还是保持着上一个输入框输入的内容，我们通过给每一个 input 框设置一个属于自身的 key 值，就可以解决这个问题，这里也一样，给两个元素分别设置一个 key 值。 -->
+    <!-- 但是我们打开页面，切换效果是有的，但是渐隐渐现的效果并没有实现，原因是，Vue 在这两个元素进行切换的时候，他会尽量的复用 DOM，所以导致这种动画不会出现，如果让 Vue 不去复用 DOM 的话，该怎么解决呢？我们回忆一下 Vue.js第2课 中的第7章讲过的 key 值，在那个例子中，有两个 input 框，因为 Vue 中 DOM 复用的机制，导致在控制台修改 data 后，input 框切换了，但是里边的值还是保持着上一个输入框输入的内容，我们通过给每一个 input 框设置一个属于自身的 key 值，就可以解决这个问题，这里也一样，给两个元素分别设置一个 key 值。 -->
 
     <!-- <style>
         .fade-enter,
@@ -130,7 +130,7 @@
             opacity: 0;
         }
 
-        .fade-enetr-active,
+        .fade-enter-active,
         .fade-leave-active {
             transition: opacity 1s;
         }
@@ -138,16 +138,16 @@
     <div id="app">
         <button @click="toggleFun">toggle</button>
         <transition name="fade" mode="out-in">
-            <child v-if="show"></child>
-            <child-one v-else></child-one>
+            <hello v-if="show"></hello>
+            <bye v-else></bye>
         </transition>
     </div>
     <script>
-        Vue.component("child", {
+        Vue.component("hello", {
             template: "<div>Hello World!</div>"
         })
-        Vue.component("child-one", {
-            template: "<div>Bye World!</div>"
+        Vue.component("bye", {
+            template: "<div>Bye world!</div>"
         })
         var app = new Vue({
             el: "#app",
@@ -156,21 +156,23 @@
             },
             methods: {
                 toggleFun: function () {
-                    this.show = !this.show
+                    this.show = !this.show;
                 }
             }
         })
     </script> -->
     <!-- 打开页面，可以看到渐隐渐现的动画效果是没有问题的，这样就实现了多个组件的过渡效果，如果改为动态组件呢？ -->
 
-    <!-- 我们先来回忆一下 Vue.js第3课第八章中讲过的动态组件，如果兄弟组件之间是通过 v-if、v-else 的方式进行判断显示的，那就可以使用 component 标签添加 :is 属性和判断条件，来显示不同的组件。接下来按照动态组件的方式修改一下上面代码： -->
+    <!-- 我们先来回忆一下 Vue.js第3课第八章中讲过的动态组件，如果兄弟组件之间是通过 v-if、v-else 的方式进行判断显示的，那就可以使用 component 标签添加 :is 属性和判断条件，来显示不同的组件。接下来按照动态组件的方式修改一下上面代码。 -->
+
+    <!-- 先来修改一下 data，可以将之前的 show 换为 type，值写成子组件名，methods 中的 toggleFun 中的代码也需要修改一下： -->
     <style>
         .fade-enter,
         .fade-leave-to {
             opacity: 0;
         }
 
-        .fade-enetr-active,
+        .fade-enter-active,
         .fade-leave-active {
             transition: opacity 1s;
         }
@@ -182,20 +184,20 @@
         </transition>
     </div>
     <script>
-        Vue.component("child", {
+        Vue.component("hello", {
             template: "<div>Hello World!</div>"
         })
-        Vue.component("child-one", {
-            template: "<div>Bye World!</div>"
+        Vue.component("bye", {
+            template: "<div>Bye world!</div>"
         })
         var app = new Vue({
             el: "#app",
             data: {
-                type: "child"
+                type: "hello"
             },
             methods: {
                 toggleFun: function () {
-                    this.type = this.type === "child" ? "child-one" : "child"
+                    this.type = this.type === "hello" ? "bye" : "hello"
                 }
             }
         })

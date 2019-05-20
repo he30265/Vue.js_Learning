@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue中的动画封装</title>
+    <script src='https://cdn.jsdelivr.net/npm/vue/dist/vue.js'></script>
+
+
+</head>
+
+<body>
+
+
+    <!-- 这一节来看一下如何进行 Vue 中的动画封装，让我们的动画变得可复用。 -->
+
+    <!-- 1、封装 style 样式的动画 -->
+
+    <!-- 先来回忆一下之前写的通过点击 toggle 实现元素渐隐渐现的效果： -->
+    <!-- <style>
+        .v-enter,
+        .v-leave-to {
+            opacity: 0;
+        }
+
+        .v-enter-active,
+        .v-leave-active {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="toggleBtnFun">toggle</button>
+        <transition>
+            <div v-if="show">Hello World!</div>
+        </transition>
+    </div>
+    <script>
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleBtnFun: function () {
+                    this.show = !this.show;
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 有的时候这种渐隐渐现的效果会用的比较多，我们就希望对这种效果进行一个封装，怎么封装呢？ -->
+
+    <!-- 可以建一个组件，例如叫 fade，然后设置模板，模板里把 transition 标签放进去，在 transition 里写一个 slot，也就是我让外部给我传一些 DOM 元素，紧接着我还需要外部给我传一个 show 这样一个变量，我要根据这个变量来判断外部传过来的 DOM 是否要被显示。然后用一下 fade 这个组件，这个组件需要传几个东西，插槽里的内容已经通过 Hello World! 传给子组件了，紧接着要传一个名字叫 show 的变量，他等于父组件的这个 show 的变量。现在已经把动画封装到了 fade 组件中，如果想再用这种动画，复制出一份这个组件就可以了，然后里面传不同的 DOM 元素就可以了（这就是为什么使用 slot 的原因了）。 -->
+
+    <!-- <style>
+        .v-enter,
+        .v-leave-to {
+            opacity: 0;
+        }
+
+        .v-enter-active,
+        .v-leave-active {
+            transition: opacity 1s;
+        }
+    </style>
+    <div id="app">
+        <button @click="toggleBtnFun">toggle</button>
+        <fade :show="show">
+            <div>Hello World!</div>
+        </fade>
+        <fade :show="show">
+            <h1>Bye World!</h1>
+        </fade>
+    </div>
+    <script>
+        Vue.component("fade", {
+            props: ["show"],
+            template: `
+                <transition>
+                    <slot v-if="show"></slot>
+                </transition>
+                `
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleBtnFun: function () {
+                    this.show = !this.show;
+                }
+            }
+        })
+    </script> -->
+
+    <!-- 打开页面，点击 toggle，不管是 div 这个元素，还是 h1 这个元素，都实现了渐隐渐现的效果。其实还可以把上面 style 中的样式也封装到子组件里，回顾一下本课第4章 Vue 中的 js 动画。 -->
+
+
+
+    <!-- 2、封装 js 样式的动画 -->
+
+    <!-- 我们通过钩子函数，将动画效果都封装到子组件的 methods 方法中： -->
+    <div id="app">
+        <button @click="toggleBtnFun">toggle</button>
+        <fade :show="show">
+            <div>Hello World!</div>
+        </fade>
+        <fade :show="show">
+            <h1>Bye World!</h1>
+        </fade>
+    </div>
+    <script>
+        Vue.component("fade", {
+            props: ["show"],
+            template: `
+                <transition
+                @before-enter="handleBeforeEnter" @enter="handleEnter" @after-enter="handleAfterEnter">
+                    <slot v-if="show"></slot>
+                </transition>
+                `,
+            methods: {
+                handleBeforeEnter: function (el) {
+                    el.style.color = "red";
+                },
+                handleEnter: function (el, done) {
+                    setTimeout(function () {
+                        el.style.color = "blue";
+                    }, 2000);
+                    setTimeout(function () {
+                        done();
+                    }, 4000);
+                },
+                handleAfterEnter: function (el) {
+                    el.style.color = "black";
+                    console.log("动画结束！");
+                }
+            }
+        })
+        var app = new Vue({
+            el: "#app",
+            data: {
+                show: true
+            },
+            methods: {
+                toggleBtnFun: function () {
+                    this.show = !this.show;
+                }
+            }
+        })
+    </script>
+
+    <!-- 打开页面可以看到，元素显示后，显示红色，2s 后变为蓝色，再 2s 后变为黑色，动画结束。 -->
+
+
+</body>
+
+</html>
