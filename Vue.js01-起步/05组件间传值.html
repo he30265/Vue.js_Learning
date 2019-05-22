@@ -10,22 +10,116 @@
 </head>
 
 <body>
-    <div id="app">
+
+
+    <!-- 在 TodoList 的基础上，我们想实现这样一个功能，点击当前元素，当前元素就被删除的效果。 -->
+
+    <!-- 先来思考一下如何给每一个子组件都添加一个点击事件？我们把事件方法写到父组件的 methods 中，此时点击子组件，会发现根本触发不了，是因为子组件的事件方法要写在子组件里，所以我们把事件方法放到子组件中的 methods 试一下： -->
+
+    <!-- <div id="app">
         <input type="text" v-model="inputValue">
         <button v-on:click="btnClick">添加</button>
         <ul>
-            <todo-list v-bind:content="item" v-bind:index="index" v-for="(item,index) in list" @delete="handleItemDelete">
+            <todo-list v-bind:content="item" v-for="item in list" @click="childClickFun">
             </todo-list>
         </ul>
     </div>
     <script>
-        // v-bind：父组件给子组件传值
-        // 创建一个局部变量，子组件 TodoList
+        var TodoList = {
+            props: ['content'],
+            template: "<li>{{content}}</li>",
+            methods: {
+                childClickFun: function () {
+                    console.loh("child");
+                }
+            }
+        };
+        var app = new Vue({
+            el: '#app',
+            components: {
+                TodoList: TodoList
+            },
+            data: {
+                list: [],
+                inputValue: ''
+            },
+            methods: {
+                btnClick: function () {
+                    this.list.push(this.inputValue);
+                    this.inputValue = '';
+                }
+            }
+        });
+    </script> -->
+
+    <!-- 打开页面，点击子组件，发现有报错：“childClickFun”没有在实例上定义，而是在呈现期间引用。 -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-98795b7972aa8690.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+ -->
+
+    <!-- 所以子组件的方法应该写在子组件的 methods 中，父组件的方法就应该写到父组件中。我们知道，父组件向子组件通过 props 传值，那子组件如何向父组件传值呢？子组件可以通过 $emit() 向父组件传值，我们来试一下： -->
+
+    <!-- <div id="app">
+        <input type="text" v-model="inputValue">
+        <button v-on:click="btnClick">添加</button>
+        <ul>
+            <todo-list v-bind:content="item" v-bind:index="index" v-for="(item,index) in list" @click="clickFun">
+            </todo-list>
+        </ul>
+    </div>
+    <script>
+        var TodoList = {
+            props: ['content', 'index'],
+            template: "<li @click='childClickFun'>{{content}}</li>",
+            methods: {
+                childClickFun: function () {
+                    this.$emit("click", this.index);
+                }
+            }
+        };
+        var app = new Vue({
+            el: '#app',
+            components: {
+                TodoList: TodoList
+            },
+            data: {
+                list: [],
+                inputValue: ''
+            },
+            methods: {
+                btnClick: function () {
+                    this.list.push(this.inputValue);
+                    this.inputValue = '';
+                },
+                clickFun: function (index) {
+                    console.log(index);
+                }
+            }
+        });
+    </script> -->
+
+    <!-- 上面代码，我在子组件中定义了一个 childClickFun，在父组件中定义了一个 clickFun。我们先给子组件 todo-list 设置一个属性 index，这个 index 是在 v-for 循环中添加的一个循环项，这样设置完成后，还需要在子组件中通过 props 接收一下。接着在子组件的 childClickFun 中通过 this.$emit() 向外触发事件，这个 $emit() 中第一个参数传递触发的事件，第二个参数点击的位置，也就是 this.index，然后在子组件的 template 中添加这个点击事件（注意：$emit() 中传入的事件名称要和 template 中 @ 后面的名称一致，可以设置其他名字） 。最后我们在父组件的 clickFun 中传一个参数 index，这个 index 就是当前点击的元素的位置，我们打开页面看一下： -->
+
+    <!-- ![](https://upload-images.jianshu.io/upload_images/9373308-e40a3148d41f61ca.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+     -->
+
+    <!-- 现在弄明白了父子组件之间的传值问题，就可以实现最初我们想要实现的那个点击当前元素删除的功能了。 -->
+
+
+    <div id="app">
+        <input type="text" v-model="inputValue">
+        <button v-on:click="btnClick">添加</button>
+        <ul>
+            <todo-list v-bind:content="item" v-bind:index="index" v-for="(item,index) in list"
+                @delete="handleItemDelete">
+            </todo-list>
+        </ul>
+    </div>
+    <script>
         var TodoList = {
             props: ['content', 'index'],
             template: "<li v-on:click='handleItemClick'>{{content}}</li>",
             methods: {
-                // 子组件中写一个 handleItemClick 方法
                 handleItemClick: function () {
                     // 子组件向父组件传值 $emit，向外触发事件
                     // 第二个参数作为点击的位置
@@ -37,7 +131,6 @@
         // 父组件
         var app = new Vue({
             el: '#app',
-            // 注册一个局部组件，把 TodoList 注册到 vue 事例中
             components: {
                 TodoList: TodoList
             },
